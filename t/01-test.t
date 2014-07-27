@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 29;
+use Test::More tests => 24;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -86,9 +86,10 @@ subtest timeout => sub {
   $exp->hard_close();
 };
 
-print "\nTesting -notransfer...\n\n";
+diag "Testing -notransfer...";
 
-{
+subtest notransfer => sub {
+  plan tests => 6;
   my $exp = Expect->new($Perl . q{ -e 'print "X some other\n"; sleep 5;'});
   $exp->notransfer(1);
   $exp->expect(3,
@@ -124,7 +125,7 @@ print "\nTesting -notransfer...\n\n";
                [ eof => sub { print "EOF\n"; ok(1); } ],
                [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
               );
-}
+};
 
 print "\nTesting raw reversing...\n\n";
 
