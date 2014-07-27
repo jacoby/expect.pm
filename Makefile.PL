@@ -7,6 +7,9 @@ WriteMakefile(
 		'IO::Tty' => 1.03,
 		'IO::Pty' => 1.03,
 	},
+	BUILD_REQUIRES => {
+		'Test::More'   => '0.94',
+	},
 	ABSTRACT_FROM => 'lib/Expect.pm',
 	clean        => { 'FILES' => '*.log' },
 	dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
