@@ -1,87 +1,91 @@
 
 use strict;
-$^W = 1;			# warnings too
+use warnings;
 
 use Test::More tests => 12;
 use File::Temp qw(tempdir);
-my $tempdir = tempdir( CLEANUP => 1 );
-
-my $Perl = $^X;
-
 use Expect;
 #$Expect::Exp_Internal = 1;
 #$Expect::Debug = 1;
 
+my $tempdir = tempdir( CLEANUP => 1 );
+my $Perl = $^X;
 
 subtest perl => sub {
-  diag "Basic tests...";
-  plan tests => 4;
+    diag "Basic tests...";
+    plan tests => 4;
 
-  my $exp = Expect->spawn("$Perl -v");
-  ok(defined $exp);
-  $exp->log_user(0);
-  is($exp->expect(10, "krzlbrtz", "Copyright"), 2);
-  is($exp->expect(10, "Larry Wall", "krzlbrtz"), 1);
-  ok(not $exp->expect(3, "Copyright"));
+    my $exp = Expect->spawn("$Perl -v");
+    ok(defined $exp);
+    $exp->log_user(0);
+    is($exp->expect(10, "krzlbrtz", "Copyright"), 2);
+    is($exp->expect(10, "Larry Wall", "krzlbrtz"), 1);
+    ok(not $exp->expect(3, "Copyright"));
 };
 
 
 subtest exec_failure => sub {
-  diag "Testing exec failure...";
-  plan tests => 6;
+    diag "Testing exec failure...";
+    plan tests => 6;
 
-  my $exp = Expect->new;
-  ok(defined $exp);
-  $exp->log_stdout(0);
-  $! = 0;
-  ok(not defined $exp->spawn("Ignore_This_Error_Its_A_Test__efluna3w6868tn8"));
-  ok($!);
-  my $val = '';
-  my $res = $exp->expect(20,
-			 [ "Cannot exec" => sub{ $val = 'cannot_exec'; }],
-			 [ eof           => sub{ $val = 'eof'; }],
-			 [ timeout       => sub{ $val = 'timeout'; }],
-			);
-  is $val, 'cannot_exec';
-  ok(defined $res);
-  is($res, 1);
+    my $exp = Expect->new;
+    ok(defined $exp);
+    $exp->log_stdout(0);
+    $! = 0;
+    ok(not defined $exp->spawn("Ignore_This_Error_Its_A_Test__efluna3w6868tn8"));
+    ok($!);
+    my $val = '';
+    my $res = $exp->expect(20,
+        [ "Cannot exec" => sub{ $val = 'cannot_exec'; }],
+        [ eof           => sub{ $val = 'eof'; }],
+        [ timeout       => sub{ $val = 'timeout'; }],
+    );
+    is $val, 'cannot_exec';
+    ok(defined $res);
+    is($res, 1);
 };
 
 
 subtest exp_continue => sub {
-  diag "Testing exp_continue...";
-  plan tests => 1;
+    diag "Testing exp_continue...";
+    plan tests => 1;
 
-  my $exp = Expect->new($Perl . q{ -e 'foreach (qw(A B C D End)) { print "$_\n"; }' });
-  my $state = "A";
-  my @val;
-  $exp->expect(2,
-       [ "[ABCD]" => sub {
-               my $self = shift;
-               push @val, $self->match;
-               exp_continue;
-           }
-       ],
-       [ "End"   => sub { push @val, 'End';     } ],
-       [ eof     => sub { push @val, 'eof';     } ],
-       [ timeout => sub { push @val, 'timeout'; } ],
-  );
-  is_deeply \@val, [qw(A B C D End)], '5 states of exp_continue';
-  $exp->hard_close();
+    my $exp = Expect->new($Perl . q{ -e 'foreach (qw(A B C D End)) { print "$_\n"; }' });
+    my $state = "A";
+    my @val;
+    $exp->expect(2,
+         [ "[ABCD]" => sub {
+                 my $self = shift;
+                 push @val, $self->match;
+                 exp_continue;
+             }
+         ],
+         [ "End"   => sub { push @val, 'End';     } ],
+         [ eof     => sub { push @val, 'eof';     } ],
+         [ timeout => sub { push @val, 'timeout'; } ],
+    );
+    is_deeply \@val, [qw(A B C D End)], '5 states of exp_continue';
+    $exp->hard_close();
 };
 
 subtest exp_continue_sleep => sub {
-  plan tests => 3;
-  my $exp = Expect->new($Perl . q{ -e 'print "Begin\n"; sleep (5); print "End\n";' });
-  my $cnt = 0;
-  $exp->expect(1,
-	       [ "Begin" => sub { ok(1); exp_continue; } ],
-	       [ "End" => sub { ok(1); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { $cnt++; ($cnt < 7)? exp_continue : 0;} ],
-              );
-  ok($cnt > 2 and $cnt < 7);
-  $exp->hard_close();
+    plan tests => 5;
+    my $exp = Expect->new($Perl . q{ -e 'print "Begin\n"; sleep (5); print "End\n";' });
+    my $cnt = 0;
+    my ($begin, $end, $eof);
+    $exp->expect(1,
+         [ "Begin" => sub { $begin = 1; exp_continue; } ],
+         [ "End"   => sub { $end   = 1; } ],
+         [ eof     => sub { $eof   = 1; } ],
+         [ timeout => sub { $cnt++; ($cnt < 7)? exp_continue : 0;} ],
+    );
+    ok $begin;
+    ok $end;
+    ok ! $eof;
+    diag "number of timeout calls in 5 sec: $cnt";
+    cmp_ok ($cnt, '>', 2);
+    cmp_ok ($cnt, '<', 7);
+    $exp->hard_close();
 };
 
 subtest timeout => sub {
