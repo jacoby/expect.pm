@@ -2072,21 +2072,11 @@ makes the pty transparently act like a bidirectional pipe.
 
 =item $object->expect($timeout, @match_patterns)
 
-or, more like Tcl/Expect,
+=over 4
 
-  expect($timeout, 
-       '-i', [ $obj1, $obj2, ... ], 
-             [ $re_pattern, sub { ...; exp_continue; }, @subparms, ],
-             [ 'eof', sub { ... } ],
-             [ 'timeout', sub { ... }, \$subparm1 ],
-       '-i', [ $objn, ...],
-             '-ex', $exact_pattern, sub { ... },
-             $exact_pattern, sub { ...; exp_continue_timeout; },
-             '-re', $re_pattern, sub { ... },
-       '-i', \@object_list, @pattern_list,
-       ...);
+=item Simple interface
 
-I<Simple interface:>
+  $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
 
 Given $timeout in seconds Expect will wait for $object's handle to produce
 one of the match_patterns, which are matched exactly by default. If you 
@@ -2125,10 +2115,6 @@ default now all strings passed to expect() are treated as literals. To
 match a regular expression pass '-re' as a parameter in front of the
 pattern you want to match as a regexp.
 
-Example:
-
-  $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
-
 This change makes it possible to match literals and regular expressions
 in the same expect() call. 
 
@@ -2145,8 +2131,20 @@ character.  telnet would return to you "\r\nEscape character is
 
   $telnet->expect(10,'-re',$match); 
 
+=item New more Tcl/Expect-like interface
 
-I<New more Tcl/Expect-like interface:>
+  expect($timeout,
+       '-i', [ $obj1, $obj2, ... ],
+             [ $re_pattern, sub { ...; exp_continue; }, @subparms, ],
+             [ 'eof', sub { ... } ],
+             [ 'timeout', sub { ... }, \$subparm1 ],
+       '-i', [ $objn, ...],
+             '-ex', $exact_pattern, sub { ... },
+             $exact_pattern, sub { ...; exp_continue_timeout; },
+             '-re', $re_pattern, sub { ... },
+       '-i', \@object_list, @pattern_list,
+       ...);
+
 
 It's now possible to expect on more than one connection at a time by
 specifying 'C<-i>' and a single Expect object or a ref to an array
@@ -2177,6 +2175,7 @@ without resetting the timeout count.
 
 `expect' is now exported by default.
 
+=back
 
 =item $object->exp_before() I<or>
 
