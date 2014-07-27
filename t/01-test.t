@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -319,9 +319,10 @@ subtest exit_status => sub {
   ok((($status >> 8) & 0x7F) == 42);
 };
 
-print "\nChecking if signal exit status is returned correctly...\n\n";
+diag "Checking if signal exit status is returned correctly...";
 
-{
+subtest signal => sub {
+  plan tests => 2;
   my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; kill 15, $$;'});
   $exp->expect(10,
                [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
@@ -334,7 +335,7 @@ print "\nChecking if signal exit status is returned correctly...\n\n";
   my ($hi, $lo) = (($status >> 8) & 0x7F, $status & 0x7F);
 
   ok($hi == 15 or $lo == 15);
-}
+};
 
 print <<__EOT__;
 
