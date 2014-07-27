@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 24;
+use Test::More tests => 13;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -127,9 +127,10 @@ subtest notransfer => sub {
               );
 };
 
-print "\nTesting raw reversing...\n\n";
+diag "Testing raw reversing...";
 
-{
+subtest raw_reversing => sub {
+  plan tests => 12;
   my @Strings =
     (
      "The quick brown fox jumped over the lazy dog.",
@@ -230,7 +231,7 @@ _EOT_
   $exp->log_file(undef);
   print "Good, your raw pty can handle at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
   ok($maxlen > 160);
-}
+};
 
 # Now test for the max. line length. Some systems are limited to ~255
 # chars per line, after which they start loosing characters.  As Cygwin 
