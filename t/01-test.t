@@ -2,21 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-my ($testnr, $maxnr, $oknr);
-
-BEGIN { $testnr = 1; $maxnr = 42; print "$testnr..$maxnr\n"; }
-sub ok ($) {
-  if ($_[0]) {
-    print "ok ", $testnr++, "\n";
-    $oknr++;
-    return 1;
-  } else {
-    print "not ok ", $testnr++, "\n";
-    my ($package, $filename, $line) = caller;
-    print "# Test failed at $filename line $line.\n";
-    return undef;
-  }
-}
+use Test::More tests => 42;
 
 sub fatal($) {
   ok(shift) or die;
@@ -358,8 +344,10 @@ __EOT__
   $exp->hard_close();
 }
 
-print "Passed $oknr of $maxnr tests.\n";
-print <<__EOT__ if ($oknr != $maxnr);
+
+use Test::Builder;
+my $Test = Test::Builder->new;
+diag <<__EOT__ if (not $Test->is_passing);
 Please scroll back and check which test(s) failed and what comments
 were given.  Expect probably is still completely usable!!
 __EOT__
