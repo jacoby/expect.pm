@@ -1853,7 +1853,7 @@ Expect - automate interactions with command line programs that expose a text ter
 
   # if you prefer the OO mindset:
   my $exp = Expect->new;
-  $exp->raw_pty(1);  
+  $exp->raw_pty(1);
   $exp->spawn($command, @parameters)
     or die "Cannot spawn $command: $!\n";
 
@@ -1883,7 +1883,7 @@ Expect - automate interactions with command line programs that expose a text ter
 
 Expect.pm is built to either spawn a process or take an existing filehandle
 and interact with it such that normally interactive tasks can be done
-without operator assistance. This concept makes more sense if you are 
+without operator assistance. This concept makes more sense if you are
 already familiar with the versatile Tcl version of Expect.
 The public functions that make up Expect.pm are:
 
@@ -1933,7 +1933,7 @@ There are several configurable package variables that affect the behavior of Exp
   $Expect::Multiline_Matching;
   $Expect::Do_Soft_Close;
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 The Expect module is a successor of Comm.pl and a descendent of Chat.pl. It
 more closely resembles the Tcl Expect language than its predecessors. It
@@ -1941,8 +1941,8 @@ does not contain any of the networking code found in Comm.pl. I suspect this
 would be obsolete anyway given the advent of IO::Socket and external tools
 such as netcat.
 
-Expect.pm is an attempt to have more of a switch() & case feeling to make 
-decision processing more fluid.  Three separate types of debugging have 
+Expect.pm is an attempt to have more of a switch() & case feeling to make
+decision processing more fluid.  Three separate types of debugging have
 been implemented to make code production easier.
 
 It is possible to interconnect multiple file handles (and processes) much
@@ -1972,7 +1972,7 @@ there for additional methods.
 =item Expect->init(\*FILEHANDLE)
 
 Initializes $new_handle_object for use with other Expect functions. It must
-be passed a B<_reference_> to FILEHANDLE if you want it to work properly. 
+be passed a B<_reference_> to FILEHANDLE if you want it to work properly.
 IO::File objects are preferable. Returns a reference to the newly created
 object.
 
@@ -2001,7 +2001,7 @@ Also note that you cannot reuse an object with an already spawned
 command, even if that command has exited.  Sorry, but you have to
 allocate a new object...
 
- 
+
 =item $object->debug(0 | 1 | 2 | 3 | undef)
 
 Sets debug level for $object. 1 refers to general debugging
@@ -2079,13 +2079,13 @@ makes the pty transparently act like a bidirectional pipe.
   $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
 
 Given $timeout in seconds Expect will wait for $object's handle to produce
-one of the match_patterns, which are matched exactly by default. If you 
-want a regexp match, prefix the pattern with '-re'. 
+one of the match_patterns, which are matched exactly by default. If you
+want a regexp match, prefix the pattern with '-re'.
 
-Due to o/s limitations $timeout should be a round number. If $timeout 
-is 0 Expect will check one time to see if $object's handle contains 
+Due to o/s limitations $timeout should be a round number. If $timeout
+is 0 Expect will check one time to see if $object's handle contains
 any of the match_patterns. If $timeout is undef Expect
-will wait forever for a pattern to match. 
+will wait forever for a pattern to match.
 
 If called in a scalar context, expect() will return the position of
 the matched pattern within $match_patterns, or undef if no pattern was
@@ -2116,20 +2116,20 @@ match a regular expression pass '-re' as a parameter in front of the
 pattern you want to match as a regexp.
 
 This change makes it possible to match literals and regular expressions
-in the same expect() call. 
+in the same expect() call.
 
 Also new is multiline matching. ^ will now match the beginning of
-lines. Unfortunately, because perl doesn't use $/ in determining where 
+lines. Unfortunately, because perl doesn't use $/ in determining where
 lines break using $ to find the end of a line frequently doesn't work. This
 is because your terminal is returning "\r\n" at the end of every line. One
 way to check for a pattern at the end of a line would be to use \r?$ instead
-of $. 
+of $.
 
 Example: Spawning telnet to a host, you might look for the escape
 character.  telnet would return to you "\r\nEscape character is
 '^]'.\r\n". To find this you might use $match='^Escape char.*\.\r?$';
 
-  $telnet->expect(10,'-re',$match); 
+  $telnet->expect(10,'-re',$match);
 
 =item New more Tcl/Expect-like interface
 
@@ -2325,7 +2325,7 @@ accept data in @objects since the escape sequence is _read_ from an object.
 Further note that the listen_group for a write-only object is always empty.
 Why would you want to have objects listening to STDOUT (for example)?
 By default every member of @objects _as well as every member of its listen
-group_ will be set to 'raw -echo' for the duration of interconnection. 
+group_ will be set to 'raw -echo' for the duration of interconnection.
 Setting $object->manual_stty() will stop this behavior per object.
 The original tty settings will be restored as interconnect exits.
 
@@ -2348,11 +2348,11 @@ supported. Too many things were changed to make versioning possible.
 =item $object->interact( C<\*FILEHANDLE, $escape_sequence>)
 
 interact() is essentially a macro for calling interconnect() for
-connecting 2 processes together. \*FILEHANDLE defaults to \*STDIN and 
+connecting 2 processes together. \*FILEHANDLE defaults to \*STDIN and
 $escape_sequence defaults to undef. Interaction ceases when $escape_sequence
-is read from B<FILEHANDLE>, not $object. $object's listen group will 
+is read from B<FILEHANDLE>, not $object. $object's listen group will
 consist solely of \*FILEHANDLE for the duration of the interaction.
-\*FILEHANDLE will not be echoed on STDOUT. 
+\*FILEHANDLE will not be echoed on STDOUT.
 
 
 =item $object->log_group(0 | 1 | undef)
@@ -2415,7 +2415,7 @@ work for log files, not code hooks.
 
 During Expect->interconnect() if $sequence is read from $object &function
 will be executed with parameters @function_parameters. It is B<_highly
-recommended_> that the escape sequence be a single character since the 
+recommended_> that the escape sequence be a single character since the
 likelihood is great that the sequence will be broken into to separate reads
 from the $object's handle, making it impossible to strip $sequence from
 getting printed to $object's listen group. \&function should be something
@@ -2430,7 +2430,7 @@ See interconnect() for details.
 
 =item $object->set_group(@listener_objects)
 
-@listener_objects is the list of objects that should have their handles 
+@listener_objects is the list of objects that should have their handles
 printed to by $object when Expect::interconnect, $object->expect() or
 $object->send_slow() are called. Calling w/out parameters will return
 the current list of the listener objects.
@@ -2438,7 +2438,7 @@ the current list of the listener objects.
 
 =item $object->manual_stty(0 | 1 | undef)
 
-Sets/unsets whether or not Expect should make reasonable guesses as to 
+Sets/unsets whether or not Expect should make reasonable guesses as to
 when and how to set tty parameters for $object. Will match
 $Expect::Manual_Stty value (normally 0) when $object is created. If called
 without parameters manual_stty() will return the current manual_stty setting.
@@ -2475,7 +2475,7 @@ print each character from each string of @strings one at a time with $delay
 seconds before each character. This is handy for devices such as modems
 that can be annoying if you send them data too fast. After each character
 $object will be checked to determine whether or not it has any new data ready
-and if so update the accumulator for future expect() calls and print the 
+and if so update the accumulator for future expect() calls and print the
 output to STDOUT and @listen_group if log_stdout and log_group are
 appropriately set.
 
@@ -2536,7 +2536,7 @@ expression. I think this is handy.
 =head1 CONTRIBUTIONS
 
 Lee Eakin <leakin@japh.itg.ti.com> has ported the kibitz script
-from Tcl/Expect to Perl/Expect.  
+from Tcl/Expect to Perl/Expect.
 
 Jeff Carr <jcarr@linuxmachines.com> provided a simple example of how
 handle terminal window resize events (transmitted via the WINCH
@@ -2554,7 +2554,7 @@ available to the perl public.
 
 As of .98 I think all the old code is toast. No way could this have been done
 without it though. Special thanks to Graham Barr for helping make sense of
-the IO::Handle stuff as well as providing the highly recommended IO::Tty 
+the IO::Handle stuff as well as providing the highly recommended IO::Tty
 module.
 
 
@@ -2562,12 +2562,12 @@ module.
 
 Mark Rogaski <rogaski@att.com> wrote:
 
-"I figured that you'd like to know that Expect.pm has been very 
-useful to AT&T Labs over the past couple of years (since I first talked to 
-Austin about design decisions). We use Expect.pm for managing 
-the switches in our network via the telnet interface, and such automation 
-has significantly increased our reliability. So, you can honestly say that 
-one of the largest digital networks in existence (AT&T Frame Relay) uses 
+"I figured that you'd like to know that Expect.pm has been very
+useful to AT&T Labs over the past couple of years (since I first talked to
+Austin about design decisions). We use Expect.pm for managing
+the switches in our network via the telnet interface, and such automation
+has significantly increased our reliability. So, you can honestly say that
+one of the largest digital networks in existence (AT&T Frame Relay) uses
 Expect.pm quite extensively."
 
 
@@ -2690,14 +2690,14 @@ rather improbable if you are using the latest IO-Tty).
 
 =head2 I want to automate password entry for su/ssh/scp/rsh/...
 
-You shouldn't use Expect for this.  Putting passwords, especially 
-root passwords, into scripts in clear text can mean severe security 
-problems.  I strongly recommend using other means.  For 'su', consider 
-switching to 'sudo', which gives you root access on a per-command and 
-per-user basis without the need to enter passwords.  'ssh'/'scp' can be 
-set up with RSA authentication without passwords.  'rsh' can use 
-the .rhost mechanism, but I'd strongly suggest to switch to 'ssh'; to 
-mention 'rsh' and 'security' in the same sentence makes an oxymoron.  
+You shouldn't use Expect for this.  Putting passwords, especially
+root passwords, into scripts in clear text can mean severe security
+problems.  I strongly recommend using other means.  For 'su', consider
+switching to 'sudo', which gives you root access on a per-command and
+per-user basis without the need to enter passwords.  'ssh'/'scp' can be
+set up with RSA authentication without passwords.  'rsh' can use
+the .rhost mechanism, but I'd strongly suggest to switch to 'ssh'; to
+mention 'rsh' and 'security' in the same sentence makes an oxymoron.
 
 It will work for 'telnet', though, and there are valid uses for it,
 but you still might want to consider using 'ssh', as keeping cleartext
@@ -2825,7 +2825,7 @@ not happen are:
 This will wait 15 seconds for a process to come up with an EOF by
 itself before killing it.
 
-  $process->expect(undef); 
+  $process->expect(undef);
 
 This will wait forever for the process to match an empty set of
 patterns. It will return when the process hits an EOF.
@@ -2840,11 +2840,11 @@ Output is only printed to the logfile/group when Expect reads from the
 process, during expect(), send_slow() and interconnect().
 One way you can force this is to make use of
 
-  $process->expect(undef); 
+  $process->expect(undef);
 
 and
 
-  $process->expect(0); 
+  $process->expect(0);
 
 which will make expect() run with an empty pattern set forever or just
 for an instant to capture the output of $process. The output is
@@ -2910,7 +2910,7 @@ terminal size and propagate the signal to the spawned application:
   $exp->slave->clone_winsize_from(\*STDIN);
   $exp->spawn("ssh somehost);
   $SIG{WINCH} = \&winch;
-  
+
   sub winch {
     $exp->slave->clone_winsize_from(\*STDIN);
     kill WINCH => $exp->pid if $exp->pid;
@@ -3037,7 +3037,7 @@ And then $process->expect($timeout,'____END____','other','patterns');
   $exp->slave->clone_winsize_from(\*STDIN);
   $exp->spawn("ssh somehost);
   $SIG{WINCH} = \&winch;
-  
+
   sub winch {
     $exp->slave->clone_winsize_from(\*STDIN);
     kill WINCH => $exp->pid if $exp->pid;
