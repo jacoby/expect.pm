@@ -1624,11 +1624,7 @@ __END__
 
 =head1 NAME
 
-Expect.pm - Expect for Perl
-
-=head1 VERSION
-
-1.21
+Expect.pm - automate interactions with command line programs that expose a text terminal interface.
 
 =head1 SYNOPSIS
 
