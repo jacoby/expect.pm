@@ -111,13 +111,13 @@ subtest notransfer => sub {
 
     my @expected = ('some', 'some', 'other');
     foreach my $e (@expected) {
-	    my $val = '';
+        my $val = '';
         $exp->expect(3,
             [ $e      => sub { $val = $e;   } ],
             [ eof     => sub { $val = 'eof';    } ],
             [ timeout => sub { $val = 'timeout';} ],
         );
-	    is $val, $e;
+        is $val, $e;
     }
 
     sleep(6);
@@ -140,67 +140,65 @@ subtest notransfer => sub {
     );
 };
 
-diag "Testing raw reversing...";
 
 subtest raw_reversing => sub {
-  plan tests => 12;
-  my @Strings =
-    (
-     "The quick brown fox jumped over the lazy dog.",
-     "Ein Neger mit Gazelle zagt im Regen nie",
-     "Was ich brauche ist ein Lagertonnennotregal",
+    diag "Testing raw reversing...";
+    plan tests => 12;
+
+    my @Strings = (
+       "The quick brown fox jumped over the lazy dog.",
+       "Ein Neger mit Gazelle zagt im Regen nie",
+       "Was ich brauche ist ein Lagertonnennotregal",
     );
 
-  my $exp = Expect->new;
-#  my $exp = Expect->new("$Perl -MIO::File -ne 'BEGIN {\$|=1; \$in = IO::File->new( \">reverse.in\" ) or die; \$in->autoflush(1); \$out = IO::File->new( \">reverse.out\" ) or die; \$out->autoflush(1); } chomp; print \$in \"\$_\\n\"; \$_ = scalar reverse; print \"\$_\\n\"; print \$out \"\$_\\n\"; '");
+    my $exp = Expect->new;
+#    my $exp = Expect->new("$Perl -MIO::File -ne 'BEGIN {\$|=1; \$in = IO::File->new( \">reverse.in\" ) or die; \$in->autoflush(1); \$out = IO::File->new( \">reverse.out\" ) or die; \$out->autoflush(1); } chomp; print \$in \"\$_\\n\"; \$_ = scalar reverse; print \"\$_\\n\"; print \$out \"\$_\\n\"; '");
+
+    print "isatty(\$exp): ";
+    if (POSIX::isatty($exp)) {
+        print "YES\n";
+    } else {
+        print "NO\n";
+    }
+
+    $exp->raw_pty(1);
+    $exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
+      or die "Cannot spawn $Perl: $!\n";
+    my $called = 0;
+    $exp->log_file(sub { $called++; });
+    foreach my $s (@Strings) {
+        my $rev = scalar reverse $s;
+        $exp->send("$s\n");
+        $exp->expect(10,
+            [ quotemeta($rev) => sub { ok(1); }],
+            [ timeout => sub { ok(0); die "Timeout"; } ],
+            [ eof => sub { ok(0); die "EOF"; } ],
+        );
+    }
+    ok($called >= @Strings);
+    $exp->log_file(undef);
+
+    # now with send_slow
+    $called = 0;
+    $exp->log_file(sub { $called++; });
+    my $delay = 0.1;
+    foreach my $s (@Strings) {
+        my $rev = scalar reverse $s;
+        my $now = time;
+        $exp->send_slow($delay, "$s\n");
+        $exp->expect(10,
+            [ quotemeta($rev) => sub { ok(1); }],
+            [ timeout => sub { ok(0); die "Timeout"; } ],
+            [ eof => sub { ok(0); die "EOF"; } ],
+        );
+        my $dur = time - $now;
+        ok($dur > length($s) * $delay);
+    }
+    ok($called >= @Strings);
+    $exp->log_file(undef);
 
 
-  print "isatty(\$exp): ";
-  if (POSIX::isatty($exp)) {
-    print "YES\n";
-  } else {
-    print "NO\n";
-  }
-
-  $exp->raw_pty(1);
-
-  $exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
-    or die "Cannot spawn $Perl: $!\n";
-  my $called = 0;
-  $exp->log_file(sub { $called++; });
-  foreach my $s (@Strings) {
-    my $rev = scalar reverse $s;
-    $exp->send("$s\n");
-    $exp->expect(10,
-		 [ quotemeta($rev) => sub { ok(1); }],
-		 [ timeout => sub { ok(0); die "Timeout"; } ],
-		 [ eof => sub { ok(0); die "EOF"; } ],
-		);
-  }
-  ok($called >= @Strings);
-  $exp->log_file(undef);
-
-  # now with send_slow
-  $called = 0;
-  $exp->log_file(sub { $called++; });
-  my $delay = 0.1;
-  foreach my $s (@Strings) {
-    my $rev = scalar reverse $s;
-    my $now = time;
-    $exp->send_slow($delay, "$s\n");
-    $exp->expect(10,
-		 [ quotemeta($rev) => sub { ok(1); }],
-		 [ timeout => sub { ok(0); die "Timeout"; } ],
-		 [ eof => sub { ok(0); die "EOF"; } ],
-		);
-    my $dur = time - $now;
-    ok($dur > length($s) * $delay);
-  }
-  ok($called >= @Strings);
-  $exp->log_file(undef);
-
-
-  print <<_EOT_;
+    print <<_EOT_;
 
 ------------------------------------------------------------------------------
 >  The following tests check system-dependend behaviour, so even if some fail,
@@ -210,40 +208,40 @@ _EOT_
 
 # we check if the raw pty can handle large chunks of text at once
 
-  my $randstring = 'fakjdf ijj845jtirg8e 4jy8 gfuoyhjgt8h gues9845th guoaeh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshftuehgfusand987vgh afugh 8h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf hajksdhf jkahsd fjkh asdHJKGDSGFKLZSTRJKSGOSJDFKGHSHGDFJGDSFJKHGSDFHJGSDKFJGSDGFSHJDGFljkhf lakjsdh fkjahs djfk hasjkdh fjklahs dfkjhasdjkf hajksdh fkjah sdjfk hasjkdh fkjashd fjkha sdjkfhehurthuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5$R%/4r76 5&/% R79 5 )/&';
-  my $maxlen;
-  $exp->log_stdout(0);
-  $exp->log_file("$tempdir/test.log");
-  my $exitloop;
-  $SIG{ALRM} = sub { die "TIMEOUT on send" };
+    my $randstring = 'fakjdf ijj845jtirg8e 4jy8 gfuoyhjgt8h gues9845th guoaeh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshftuehgfusand987vgh afugh 8h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf hajksdhf jkahsd fjkh asdHJKGDSGFKLZSTRJKSGOSJDFKGHSHGDFJGDSFJKHGSDFHJGSDKFJGSDGFSHJDGFljkhf lakjsdh fkjahs djfk hasjkdh fjklahs dfkjhasdjkf hajksdh fkjah sdjfk hasjkdh fkjashd fjkha sdjkfhehurthuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5$R%/4r76 5&/% R79 5 )/&';
+    my $maxlen;
+    $exp->log_stdout(0);
+    $exp->log_file("$tempdir/test.log");
+    my $exitloop;
+    $SIG{ALRM} = sub { die "TIMEOUT on send" };
 
-  foreach my $len (1 .. length($randstring)) {
-    print "$len\r";
-    my $s = substr($randstring, 0, $len);
-    my $rev = scalar reverse $s;
-    eval {
-      alarm(10);
-      $exp->send("$s\n");
-      alarm(0);
-    };
-    if ($@) {
-      ok($maxlen > 80);
-      print "Warning: your raw pty blocks when sending more than $maxlen bytes!\n";
-      $exitloop = 1;
-      last;
+    foreach my $len (1 .. length($randstring)) {
+        print "$len\r";
+        my $s = substr($randstring, 0, $len);
+        my $rev = scalar reverse $s;
+        eval {
+            alarm(10);
+            $exp->send("$s\n");
+            alarm(0);
+        };
+        if ($@) {
+            ok($maxlen > 80);
+            print "Warning: your raw pty blocks when sending more than $maxlen bytes!\n";
+            $exitloop = 1;
+            last;
+        }
+        $exp->expect(10,
+            [ quotemeta($rev) => sub {$maxlen = $len; }],
+            [ timeout => sub { ok($maxlen > 160);
+                print "Warning: your raw pty can only handle $maxlen bytes at a time!\n" ;
+                $exitloop = 1; } ],
+            [ eof => sub { ok(0); die "EOF"; } ],
+        );
+      last if $exitloop;
     }
-    $exp->expect(10,
-		 [ quotemeta($rev) => sub {$maxlen = $len; }],
-		 [ timeout => sub { ok($maxlen > 160);
-				    print "Warning: your raw pty can only handle $maxlen bytes at a time!\n" ;
-				    $exitloop = 1; } ],
-		 [ eof => sub { ok(0); die "EOF"; } ],
-		);
-    last if $exitloop;
-  }
-  $exp->log_file(undef);
-  print "Good, your raw pty can handle at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
-  ok($maxlen > 160);
+    $exp->log_file(undef);
+    print "Good, your raw pty can handle at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
+    ok($maxlen > 160);
 };
 
 # Now test for the max. line length. Some systems are limited to ~255
@@ -252,102 +250,104 @@ _EOT_
 # to avoid that.
 
 subtest max_line_length => sub {
-  plan tests => 1;
-  my $exp = Expect->new("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
-    or die "Cannot spawn $Perl: $!\n";
+    plan tests => 1;
 
-  $exp->log_stdout(0);
-  my $randstring = 'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
-  my $maxlen;
-  my $exitloop;
-  foreach my $len (1 .. length($randstring)) {
-    print "$len\r";
-    my $s = substr($randstring, 0, $len);
-    my $rev = scalar reverse $s;
-    eval {
-      alarm(10);
-      $exp->send("$s\n");
-      alarm(0);
-    };
-    if ($@) {
-      ok($maxlen > 80);
-      print "Warning: your default pty blocks when sending more than $maxlen bytes per line!\n";
-      $exitloop = 1;
-      last;
+    my $exp = Expect->new("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
+      or die "Cannot spawn $Perl: $!\n";
+
+    $exp->log_stdout(0);
+    my $randstring = 'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
+    my $maxlen;
+    my $exitloop;
+    foreach my $len (1 .. length($randstring)) {
+        print "$len\r";
+        my $s = substr($randstring, 0, $len);
+        my $rev = scalar reverse $s;
+        eval {
+            alarm(10);
+            $exp->send("$s\n");
+            alarm(0);
+        };
+        if ($@) {
+            ok($maxlen > 80);
+            print "Warning: your default pty blocks when sending more than $maxlen bytes per line!\n";
+            $exitloop = 1;
+            last;
+        }
+        $exp->expect(10,
+            [ quotemeta($rev) => sub {$maxlen = $len; }],
+            [ timeout => sub { print "Warning: your default pty can only handle $maxlen bytes at a time!\n" ;
+               $exitloop = 1; } ],
+            [ eof => sub { ok(0); die "EOF"; } ],
+        );
     }
-    $exp->expect(10,
-		 [ quotemeta($rev) => sub {$maxlen = $len; }],
-		 [ timeout => sub { print "Warning: your default pty can only handle $maxlen bytes at a time!\n" ;
-				    $exitloop = 1; } ],
-		 [ eof => sub { ok(0); die "EOF"; } ],
-		);
-  }
-  print "Good, your default pty can handle lines of at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
-  ok($maxlen > 100);
+    print "Good, your default pty can handle lines of at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
+    ok($maxlen > 100);
 };
 
 subtest controlling_termnal => sub {
-  plan tests => 1;
-  diag "Testing controlling terminal...";
-  my $exp = Expect->new($Perl . q{ -MIO::Handle -e 'open(TTY, "+>/dev/tty") or die "no controlling terminal"; autoflush TTY 1; print TTY "Expect_test_prompt: "; $s = <TTY>; chomp $s; print "uc: \U$s\n"; close TTY; exit 0;'});
+    diag "Testing controlling terminal...";
+    plan tests => 1;
 
-  my $pwd = "pAsswOrd";
-  $exp->log_file("$tempdir/test_dev_tty.log");
-  $exp->expect(10,
-	       [ qr/Expect_test_prompt:/, sub {
-		   my $self = shift;
-		   $self->send("$pwd\n");
-		   $exp->log_file(undef);
-		   exp_continue;
-		 } ],
-	       [ qr/(?m:^uc:\s*(\w+))/, sub {
-		   my $self = shift;
-		   my ($s) = $self->matchlist;
-		   chomp $s;
-		   print "match: $s\n";
-		   ok($s eq uc($pwd));
-		 } ],
-	       [ eof => sub {
-		   ok(0); die "EOF";
-		 } ],
-	       [ timeout => sub {
-		   ok(0); die "Timeout";
-		 } ],
-	      );
+    my $exp = Expect->new($Perl . q{ -MIO::Handle -e 'open(TTY, "+>/dev/tty") or die "no controlling terminal"; autoflush TTY 1; print TTY "Expect_test_prompt: "; $s = <TTY>; chomp $s; print "uc: \U$s\n"; close TTY; exit 0;'});
+
+    my $pwd = "pAsswOrd";
+    $exp->log_file("$tempdir/test_dev_tty.log");
+    $exp->expect(10,
+        [ qr/Expect_test_prompt:/, sub {
+                my $self = shift;
+                $self->send("$pwd\n");
+                $exp->log_file(undef);
+                exp_continue;
+            }
+        ],
+        [ qr/(?m:^uc:\s*(\w+))/, sub {
+                my $self = shift;
+                my ($s) = $self->matchlist;
+                chomp $s;
+                print "match: $s\n";
+                ok($s eq uc($pwd));
+            }
+       ],
+       [ eof => sub { ok(0); die "EOF"; } ],
+       [ timeout => sub { ok(0); die "Timeout"; } ],
+    );
 };
 
-diag "Checking if exit status is returned correctly...";
 
 subtest exit_status => sub {
-  plan tests => 2;
-  my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; exit(42);'});
-  $exp->expect(10,
-               [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
-               [ eof => sub { print "eof\n"; } ],
-               [ timeout => sub { print "timeout\n";} ],
-              );
-  my $status = $exp->soft_close();
-  printf "soft_close: 0x%04X\n", $status;
-  ok($exp->exitstatus() == $status);
-  ok((($status >> 8) & 0x7F) == 42);
+    diag "Checking if exit status is returned correctly...";
+    plan tests => 2;
+
+    my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; exit(42);'});
+    $exp->expect(10,
+                 [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
+                 [ eof => sub { print "eof\n"; } ],
+                 [ timeout => sub { print "timeout\n";} ],
+                );
+    my $status = $exp->soft_close();
+    printf "soft_close: 0x%04X\n", $status;
+    ok($exp->exitstatus() == $status);
+    ok((($status >> 8) & 0x7F) == 42);
 };
 
-diag "Checking if signal exit status is returned correctly...";
 
 subtest signal => sub {
-  plan tests => 2;
-  my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; kill 15, $$;'});
-  $exp->expect(10,
-               [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
-               [ eof => sub { print "eof\n"; } ],
-               [ timeout => sub { print "timeout\n";} ],
-              );
-  my $status = $exp->soft_close();
-  printf "soft_close: 0x%04X\n", $status;
-  ok($exp->exitstatus() == $status);
-  my ($hi, $lo) = (($status >> 8) & 0x7F, $status & 0x7F);
+    diag "Checking if signal exit status is returned correctly...";
+    plan tests => 2;
 
-  ok($hi == 15 or $lo == 15);
+    my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; kill 15, $$;'});
+    $exp->expect(10,
+        [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
+        [ eof => sub { print "eof\n"; } ],
+        [ timeout => sub { print "timeout\n";} ],
+    );
+    my $status = $exp->soft_close();
+    printf "soft_close: 0x%04X\n", $status;
+    ok($exp->exitstatus() == $status);
+    my ($hi, $lo) = (($status >> 8) & 0x7F, $status & 0x7F);
+
+    ok($hi == 15 or $lo == 15);
 };
 
 diag <<__EOT__;
@@ -359,15 +359,16 @@ Checking if EOF on pty slave is correctly reported to master...
 __EOT__
 
 subtest eof_on_pty => sub {
-  plan tests => 1;
-  my $exp = Expect->new($Perl . q{ -e 'close STDIN; close STDOUT; close STDERR; sleep 3;'});
-  my $res;
-  $exp->expect(2,
-               [ eof     => sub { $res = 'eof' } ],
-               [ timeout => sub { $res = 'timeout' } ], # print "TIMEOUT\nSorry, you may not notice if the spawned process closes the pty.\n"; } ],
-              );
-  is $res, 'timeout';
-  $exp->hard_close();
+    plan tests => 1;
+
+    my $exp = Expect->new($Perl . q{ -e 'close STDIN; close STDOUT; close STDERR; sleep 3;'});
+    my $res;
+    $exp->expect(2,
+        [ eof     => sub { $res = 'eof' } ],
+        [ timeout => sub { $res = 'timeout' } ], # print "TIMEOUT\nSorry, you may not notice if the spawned process closes the pty.\n"; } ],
+    );
+    is $res, 'timeout';
+    $exp->hard_close();
 };
 
 
