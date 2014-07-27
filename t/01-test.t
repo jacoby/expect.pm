@@ -34,11 +34,13 @@ subtest exec_failure => sub {
   $! = 0;
   ok(not defined $exp->spawn("Ignore_This_Error_Its_A_Test__efluna3w6868tn8"));
   ok($!);
+  my $val = '';
   my $res = $exp->expect(20,
-			 [ "Cannot exec" => sub{ ok(1); }],
-			 [ eof => sub{ print "EOF\n"; ok(1) }],
-			 [ timeout => sub{ print "TIMEOUT\n"; ok(0) }],
+			 [ "Cannot exec" => sub{ $val = 'cannot_exec'; }],
+			 [ eof           => sub{ $val = 'eof'; }],
+			 [ timeout       => sub{ $val = 'timeout'; }],
 			);
+  is $val, 'cannot_exec';
   ok(defined $res);
   is($res, 1);
 };
