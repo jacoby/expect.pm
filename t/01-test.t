@@ -70,6 +70,7 @@ subtest exp_continue => sub {
 
 subtest exp_continue_sleep => sub {
     plan tests => 5;
+
     my $exp = Expect->new($Perl . q{ -e 'print "Begin\n"; sleep (5); print "End\n";' });
     my $cnt = 0;
     my ($begin, $end, $eof);
@@ -89,54 +90,54 @@ subtest exp_continue_sleep => sub {
 };
 
 subtest timeout => sub {
-  plan tests => 2;
-  # timeout shouldn't destroy accum contents
-  my $exp = Expect->new($Perl . q{ -e 'print "some string\n"; sleep (5);' });
-  ok(not defined $exp->expect(1, "NoMaTcH"));
-  my $i = $exp->expect(1, '-re', 'some\s');
-  ok (defined $i and $i == 1);
-  $exp->hard_close();
+    diag "timeout shouldn't destroy accum contents";
+    plan tests => 3;
+
+    my $exp = Expect->new($Perl . q{ -e 'print "some string\n"; sleep (5);' });
+    ok(not defined $exp->expect(1, "NoMaTcH"));
+    my $i = $exp->expect(1, '-re', 'some\s');
+    ok (defined $i);
+    is $i, 1;
+    $exp->hard_close();
 };
 
-diag "Testing -notransfer...";
 
 subtest notransfer => sub {
-  plan tests => 6;
-  my $exp = Expect->new($Perl . q{ -e 'print "X some other\n"; sleep 5;'});
-  $exp->notransfer(1);
-  $exp->expect(3,
-	       [ "some" => sub { ok(1); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
-  $exp->expect(3,
-	       [ "some" => sub { ok(1); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
-  $exp->expect(3,
-	       [ "other" => sub { ok(1); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
-  sleep(6);
-  $exp->expect(3,
-	       [ "some" => sub { my $self = shift; ok(1); $self->set_accum($self->after()); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
-  $exp->expect(3,
-	       [ "some" => sub { ok(0); } ],
-	       [ "other" => sub { my $self = shift; ok(1); $self->set_accum($self->after()); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
-  $exp->expect(3,
-	       [ "some" => sub { ok(0); } ],
-	       [ "other" => sub { ok(0); } ],
-               [ eof => sub { print "EOF\n"; ok(1); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
+    diag "Testing -notransfer...";
+    plan tests => 6;
+
+    my $exp = Expect->new($Perl . q{ -e 'print "X some other\n"; sleep 5;'});
+    $exp->notransfer(1);
+
+    my @expected = ('some', 'some', 'other');
+    foreach my $e (@expected) {
+	    my $val = '';
+        $exp->expect(3,
+            [ $e      => sub { $val = $e;   } ],
+            [ eof     => sub { $val = 'eof';    } ],
+            [ timeout => sub { $val = 'timeout';} ],
+        );
+	    is $val, $e;
+    }
+
+    sleep(6);
+    $exp->expect(3,
+             [ "some" => sub { my $self = shift; ok(1); $self->set_accum($self->after()); } ],
+             [ eof => sub { print "EOF\n"; ok(0); } ],
+             [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
+    );
+    $exp->expect(3,
+             [ "some" => sub { ok(0); } ],
+             [ "other" => sub { my $self = shift; ok(1); $self->set_accum($self->after()); } ],
+             [ eof => sub { print "EOF\n"; ok(0); } ],
+             [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
+    );
+    $exp->expect(3,
+             [ "some" => sub { ok(0); } ],
+             [ "other" => sub { ok(0); } ],
+             [ eof => sub { print "EOF\n"; ok(1); } ],
+             [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
+    );
 };
 
 diag "Testing raw reversing...";
