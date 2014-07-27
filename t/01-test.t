@@ -6,10 +6,6 @@ use Test::More tests => 42;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
-sub fatal($) {
-  ok(shift) or die;
-}
-
 my $Perl = $^X;
 
 use Expect;
@@ -20,11 +16,11 @@ print "\nBasic tests...\n\n";
 
 {
   my $exp = Expect->spawn("$Perl -v");
-  fatal(defined $exp);
+  ok(defined $exp);
   $exp->log_user(0);
-  fatal($exp->expect(10, "krzlbrtz", "Copyright") == 2);
-  fatal($exp->expect(10, "Larry Wall", "krzlbrtz") == 1);
-  fatal(not $exp->expect(3, "Copyright"));
+  ok($exp->expect(10, "krzlbrtz", "Copyright") == 2);
+  ok($exp->expect(10, "Larry Wall", "krzlbrtz") == 1);
+  ok(not $exp->expect(3, "Copyright"));
 }
 
 print "\nTesting exec failure...\n\n";
@@ -34,7 +30,7 @@ print "\nTesting exec failure...\n\n";
   ok(defined $exp);
   $exp->log_stdout(0);
   $! = 0;
-  fatal(not defined $exp->spawn("Ignore_This_Error_Its_A_Test__efluna3w6868tn8"));
+  ok(not defined $exp->spawn("Ignore_This_Error_Its_A_Test__efluna3w6868tn8"));
   ok($!);
   my $res = $exp->expect(20,
 			 [ "Cannot exec" => sub{ ok(1); }],
