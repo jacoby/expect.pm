@@ -296,5 +296,6 @@ Expect v1.20
 	New mainainer (Gabor Szabo)
 	Merge .pod and .pm
 	Move the test and the code to standard location in tha distribution.
+	Typos fixed in pod RT #86852.   
 
 

@@ -1728,7 +1728,7 @@ There are several configurable package variables that affect the behavior of Exp
 =head1 DESCRIPTION 
 
 The Expect module is a successor of Comm.pl and a descendent of Chat.pl. It
-more closely ressembles the Tcl Expect language than its predecessors. It
+more closely resembles the Tcl Expect language than its predecessors. It
 does not contain any of the networking code found in Comm.pl. I suspect this
 would be obsolete anyway given the advent of IO::Socket and external tools
 such as netcat.
@@ -2199,7 +2199,7 @@ to the logfile:
 =item $object->print_log_file(@strings)
 
 Prints to logfile (if opened) or calls the logfile hook function.
-This allows the user to add arbitraty text to the logfile.  Note that
+This allows the user to add arbitrary text to the logfile.  Note that
 this could also be done as $object->log_file->print() but would only
 work for log files, not code hooks.
 
@@ -2395,7 +2395,7 @@ appreciated).
 =head2 The examples in the tutorial don't work!
 
 The tutorial is hopelessly out of date and needs a serious overhaul.
-I appologize for this, I have concentrated my efforts mainly on the
+I apologize for this, I have concentrated my efforts mainly on the
 functionality.  Volunteers welcomed.
 
 
@@ -2570,7 +2570,7 @@ See the source example below.
 =head2 I seem to have problems with ptys!
 
 Well, pty handling is really a black magic, as it is extremely system
-dependend.  I have extensively revised IO-Tty, so these problems
+dependent.  I have extensively revised IO-Tty, so these problems
 should be gone.
 
 If your system is listed in the "verified" list of IO::Tty, you
