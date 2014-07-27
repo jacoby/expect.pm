@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 42;
+use Test::More tests => 32;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -12,20 +12,22 @@ use Expect;
 #$Expect::Exp_Internal = 1;
 #$Expect::Debug = 1;
 
-print "\nBasic tests...\n\n";
+diag "Basic tests...";
 
-{
+subtest perl => sub {
+  plan tests => 4;
   my $exp = Expect->spawn("$Perl -v");
   ok(defined $exp);
   $exp->log_user(0);
-  ok($exp->expect(10, "krzlbrtz", "Copyright") == 2);
-  ok($exp->expect(10, "Larry Wall", "krzlbrtz") == 1);
+  is($exp->expect(10, "krzlbrtz", "Copyright"), 2);
+  is($exp->expect(10, "Larry Wall", "krzlbrtz"), 1);
   ok(not $exp->expect(3, "Copyright"));
-}
+};
 
-print "\nTesting exec failure...\n\n";
+diag "Testing exec failure...";
 
-{
+subtest exec_failure => sub {
+  plan tests => 6;
   my $exp = Expect->new;
   ok(defined $exp);
   $exp->log_stdout(0);
@@ -37,12 +39,14 @@ print "\nTesting exec failure...\n\n";
 			 [ eof => sub{ print "EOF\n"; ok(1) }],
 			 [ timeout => sub{ print "TIMEOUT\n"; ok(0) }],
 			);
-#  ok(defined $res and $res == 1);
-}
+  ok(defined $res);
+  is($res, 1);
+};
 
-print "\nTesting exp_continue...\n\n";
+diag "Testing exp_continue...";
 
-{
+subtest exp_continue => sub {
+  plan tests => 5;
   my $exp = Expect->new($Perl . q{ -e 'foreach (qw(A B C D End)) { print "$_\n"; }' });
   my $state = "A";
   $exp->expect(2,
@@ -56,7 +60,7 @@ print "\nTesting exp_continue...\n\n";
                [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
               );
   $exp->hard_close();
-}
+};
 
 {
   my $exp = Expect->new($Perl . q{ -e 'print "Begin\n"; sleep (5); print "End\n";' });

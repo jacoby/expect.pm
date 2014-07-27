@@ -8,7 +8,7 @@ WriteMakefile(
 		'IO::Pty' => 1.03,
 	},
 	BUILD_REQUIRES => {
-		'Test::More'   => '0.94',
+		'Test::More'   => '1.00',
 	},
 	ABSTRACT_FROM => 'lib/Expect.pm',
 	clean        => { 'FILES' => '*.log' },
