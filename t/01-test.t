@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 32;
+use Test::More tests => 30;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -62,7 +62,8 @@ subtest exp_continue => sub {
   $exp->hard_close();
 };
 
-{
+subtest exp_continue_sleep => sub {
+  plan tests => 3;
   my $exp = Expect->new($Perl . q{ -e 'print "Begin\n"; sleep (5); print "End\n";' });
   my $cnt = 0;
   $exp->expect(1,
@@ -73,7 +74,7 @@ subtest exp_continue => sub {
               );
   ok($cnt > 2 and $cnt < 7);
   $exp->hard_close();
-}
+};
 
 {
   # timeout shouldn't destroy accum contents
