@@ -1624,7 +1624,7 @@ __END__
 
 =head1 NAME
 
-Expect.pm - automate interactions with command line programs that expose a text terminal interface.
+Expect - automate interactions with command line programs that expose a text terminal interface.
 
 =head1 SYNOPSIS
 
