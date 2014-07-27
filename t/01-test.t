@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -303,9 +303,10 @@ subtest controlling_termnal => sub {
 	      );
 };
 
-print "\nChecking if exit status is returned correctly...\n\n";
+diag "Checking if exit status is returned correctly...";
 
-{
+subtest exit_status => sub {
+  plan tests => 2;
   my $exp = Expect->new($Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; exit(42);'});
   $exp->expect(10,
                [ qr/Expect_test_pid:/, sub { my $self = shift; } ],
@@ -316,7 +317,7 @@ print "\nChecking if exit status is returned correctly...\n\n";
   printf "soft_close: 0x%04X\n", $status;
   ok($exp->exitstatus() == $status);
   ok((($status >> 8) & 0x7F) == 42);
-}
+};
 
 print "\nChecking if signal exit status is returned correctly...\n\n";
 
