@@ -3,6 +3,8 @@ use strict;
 $^W = 1;			# warnings too
 
 use Test::More tests => 42;
+use File::Temp qw(tempdir);
+my $tempdir = tempdir( CLEANUP => 1 );
 
 sub fatal($) {
   ok(shift) or die;
@@ -194,7 +196,7 @@ _EOT_
   my $randstring = 'fakjdf ijj845jtirg8e 4jy8 gfuoyhjgt8h gues9845th guoaeh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshftuehgfusand987vgh afugh 8h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf hajksdhf jkahsd fjkh asdHJKGDSGFKLZSTRJKSGOSJDFKGHSHGDFJGDSFJKHGSDFHJGSDKFJGSDGFSHJDGFljkhf lakjsdh fkjahs djfk hasjkdh fjklahs dfkjhasdjkf hajksdh fkjah sdjfk hasjkdh fkjashd fjkha sdjkfhehurthuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5$R%/4r76 5&/% R79 5 )/&';
   my $maxlen;
   $exp->log_stdout(0);
-  $exp->log_file("test.log");
+  $exp->log_file("$tempdir/test.log");
   my $exitloop;
   $SIG{ALRM} = sub { die "TIMEOUT on send" };
 
@@ -271,7 +273,7 @@ _EOT_
   my $exp = new Expect($Perl . q{ -MIO::Handle -e 'open(TTY, "+>/dev/tty") or die "no controlling terminal"; autoflush TTY 1; print TTY "Expect_test_prompt: "; $s = <TTY>; chomp $s; print "uc: \U$s\n"; close TTY; exit 0;'});
 
   my $pwd = "pAsswOrd";
-  $exp->log_file("test_dev_tty.log");
+  $exp->log_file("$tempdir/test_dev_tty.log");
   $exp->expect(10,
 	       [ qr/Expect_test_prompt:/, sub {
 		   my $self = shift;
