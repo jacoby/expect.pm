@@ -1,6 +1,7 @@
 1.23
     Refactoring test script.
     Eliminate indirect calls in the code and in the docs.
+    Use Perl::Tidy to unify layout. 
 
 1.22 2014-07-27
     New unofficial mainainer (Gabor Szabo)
