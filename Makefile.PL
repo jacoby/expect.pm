@@ -6,7 +6,7 @@ my $Is_Beta = 0;
 
 WriteMakefile(
 	      'NAME'	     => 'Expect',
-	      'VERSION_FROM' => 'Expect.pm',
+	      'VERSION_FROM' => 'lib/Expect.pm',
 	      'PREREQ_PM'    => {
                                   'IO::Tty' => 1.03,
                                   'IO::Pty' => 1.03,
