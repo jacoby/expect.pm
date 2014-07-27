@@ -238,7 +238,8 @@ _EOT_
 # then hangs and cannot be freed via alarm, we only test up to 160 characters
 # to avoid that.
 
-{
+subtest max_line_length => sub {
+  plan tests => 1;
   my $exp = Expect->new("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
     or die "Cannot spawn $Perl: $!\n";
 
@@ -270,10 +271,11 @@ _EOT_
   }
   print "Good, your default pty can handle lines of at least ".length($randstring)." bytes at a time.\n" if not $exitloop;
   ok($maxlen > 100);
-}
+};
 
-{
-  print "\nTesting controlling terminal...\n\n";
+subtest controlling_termnal => sub {
+  plan tests => 1;
+  diag "Testing controlling terminal...";
   my $exp = Expect->new($Perl . q{ -MIO::Handle -e 'open(TTY, "+>/dev/tty") or die "no controlling terminal"; autoflush TTY 1; print TTY "Expect_test_prompt: "; $s = <TTY>; chomp $s; print "uc: \U$s\n"; close TTY; exit 0;'});
 
   my $pwd = "pAsswOrd";
@@ -299,7 +301,7 @@ _EOT_
 		   ok(0); die "Timeout";
 		 } ],
 	      );
-}
+};
 
 print "\nChecking if exit status is returned correctly...\n\n";
 
