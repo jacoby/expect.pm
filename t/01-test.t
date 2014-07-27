@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 30;
+use Test::More tests => 29;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -76,14 +76,15 @@ subtest exp_continue_sleep => sub {
   $exp->hard_close();
 };
 
-{
+subtest timeout => sub {
+  plan tests => 2;
   # timeout shouldn't destroy accum contents
   my $exp = Expect->new($Perl . q{ -e 'print "some string\n"; sleep (5);' });
   ok(not defined $exp->expect(1, "NoMaTcH"));
   my $i = $exp->expect(1, '-re', 'some\s');
   ok (defined $i and $i == 1);
   $exp->hard_close();
-}
+};
 
 print "\nTesting -notransfer...\n\n";
 
