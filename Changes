@@ -1,7 +1,12 @@
+1.23
+    Refactoring test script.
+    Eliminate indirect calls in the code and in the docs.
+
 1.22 2014-07-27
     New unofficial mainainer (Gabor Szabo)
     Merge .pod and .pm and move them to lib/
     Move the test and the code to standard location /t in the distribution.
+    Eliminate indirect calls in tests.
     Use Test::More instead of home-brew testing.
     Typos fixed in pod RT #86852.
     Changes file re-ordered and standardized.

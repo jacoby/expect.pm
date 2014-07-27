@@ -17,13 +17,11 @@
 use 5.006;				# 4 won't cut it.
 
 package Expect;
+use strict;
 
 use IO::Pty 1.03;		# We need make_slave_controlling_terminal()
 use IO::Tty;
 
-use strict 'refs';
-use strict 'vars';
-use strict 'subs';
 use POSIX qw(:sys_wait_h :unistd_h); # For WNOHANG and isatty
 use Fcntl qw(:DEFAULT); # For checking file handle settings.
 use Carp qw(cluck croak carp confess);
@@ -70,7 +68,7 @@ sub new {
   $class = ref($class) if ref($class); # so we can be called as $exp->new()
 
   # Create the pty which we will use to pass process info.
-  my($self) = new IO::Pty;
+  my($self) = IO::Pty->new;
   die "$class: Could not assign a pty" unless $self;
   bless $self => $class;
   $self->autoflush(1);
@@ -358,7 +356,7 @@ sub log_file {
     my $fh = $file;
     if (not ref($file)) {
       # it's a filename
-      $fh = new IO::File $file, $mode
+      $fh = IO::File->new($file, $mode)
 	or croak "Cannot open logfile $file: $!";
     }
     if (ref($file) ne 'CODE') {
@@ -1035,13 +1033,13 @@ sub interact {
   no strict 'subs';		# Allow bare word 'STDIN'
   unless (defined($infile)) {
     # We need a handle object Associated with STDIN.
-    $infile = new IO::File;
+    $infile = IO::File->new;
     $infile->IO::File::fdopen(STDIN,'r');
-    $outfile = new IO::File;
+    $outfile = IO::File->new;
     $outfile->IO::File::fdopen(STDOUT,'w');
   } elsif (fileno($infile) == fileno(STDIN)) {
     # With STDIN we want output to go to stdout.
-    $outfile = new IO::File;
+    $outfile = IO::File->new;
     $outfile->IO::File::fdopen(STDOUT,'w');
   } else {
     undef ($outfile);
@@ -1644,7 +1642,7 @@ Expect.pm - Expect for Perl
   my $exp = Expect->exp_init(\*FILEHANDLE);
 
   # if you prefer the OO mindset:
-  my $exp = new Expect;
+  my $exp = Expect->new;
   $exp->raw_pty(1);  
   $exp->spawn($command, @parameters)
     or die "Cannot spawn $command: $!\n";
@@ -1750,7 +1748,7 @@ L</"I want to use Expect to automate [anything with a buzzword]...">
 
 =over 4
 
-=item new Expect ()
+=item new
 
 Creates a new Expect object, i.e. a pty.  You can change parameters on
 it before actually spawning a command.  This is important if you want
@@ -1778,7 +1776,7 @@ hosts. YMMV.
 
 =item $object->spawn($command, @parameters) I<or>
 
-=item new Expect ($command, @parameters)
+=item Expect->new($command, @parameters)
 
 Forks and execs $command. Returns an Expect object upon success or
 C<undef> if the fork was unsuccessful or the command could not be
@@ -2666,7 +2664,7 @@ as '\r' translation would not work anymore.  On the other hand, a raw
 pty works much like a pipe and is more WYGIWYE (what you get is what
 you expect), so I suggest you set it to 'raw' by yourself:
 
-  $exp = new Expect;
+  $exp = Expect->new;
   $exp->raw_pty(1);
   $exp->spawn(...);
 
@@ -2680,7 +2678,7 @@ To disable echo:
 You have to set the terminal screen size for that.  Luckily, IO::Pty
 already has a method for that, so modify your code to look like this:
 
-  my $exp = new Expect;
+  my $exp = Expect->new;
   $exp->slave->clone_winsize_from(\*STDIN);
   $exp->spawn("telnet somehost);
 
@@ -2698,7 +2696,7 @@ please figure out the details by yourself.
 You have to catch the signal WINCH ("window size changed"), change the
 terminal size and propagate the signal to the spawned application:
 
-  my $exp = new Expect;
+  my $exp = Expect->new;
   $exp->slave->clone_winsize_from(\*STDIN);
   $exp->spawn("ssh somehost);
   $SIG{WINCH} = \&winch;
@@ -2746,7 +2744,7 @@ And then $process->expect($timeout,'____END____','other','patterns');
 
 =head2 How to automate login
 
-  my $telnet = new Net::Telnet ("remotehost") # see Net::Telnet
+  my $telnet = Net::Telnet->new("remotehost") # see Net::Telnet
     or die "Cannot telnet to remotehost: $!\n";;
   my $exp = Expect->exp_init($telnet);
 
@@ -2825,7 +2823,7 @@ And then $process->expect($timeout,'____END____','other','patterns');
 
 =head2 How to propagate terminal sizes
 
-  my $exp = new Expect;
+  my $exp = Expect->new;
   $exp->slave->clone_winsize_from(\*STDIN);
   $exp->spawn("ssh somehost);
   $SIG{WINCH} = \&winch;
