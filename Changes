@@ -22,11 +22,11 @@
     ! fixed bug in _make_readable()
     + now included example ssh.pl in MANIFEST so it gets packaged :-(
 
-1.19 
+1.19 2006-07-17
     ! fixed non-localized usage of $_
     + added new example ssh.pl
 
-1.18
+1.18 2006-07-11
     ! added another pipe to synchronize spawning. Closing the slave in the
       parent can lead to a hang if the child already wrote something into
       it...
@@ -35,7 +35,7 @@
 1.17 2006-05-31
     ! fixed param check for expect() to allow expect(undef) et al
 
-1.16
+1.16 2006-05-05
     ! fixed hangup with pipe sync upon spawn by adding close-on-exec to pipe handle
     ! fixed log_file(undef) when logging to CODE ref
     ! fixed $? mangling in DESTROY by saving & restoring status
@@ -47,26 +47,32 @@
     ! fixed bug in _multi_expect, pattern weren't tried against accum due
       to exp_New_Data not set.
 
-1.14
+1.14 2002-03-13
     same as 1.13_10
     ! fixed select in interconnect, may return -1 if interrupted by signal.
 
-1.13_08
+1.13_08 2002-02-28
     ! fixed bug in log_file, parameter now gets set to undef.
 
-1.13_07
+1.13_07 2002-02-28
     + added and corrected test for exit status; got rid of Test.pm
     ! use 'set_raw' instead of stty("raw"); IO::Stty now optional
     + updated docs & FAQs; explained how terminal sizes and SIGWINCH
       should be propagated
 
-1.13_06
+1.13_06 2002-01-31
     ! spawn is back again
     + rearranged and changed tests to better suit the various systems
     + added rudimentary 'notransfer' option; global only, not on
       per-pattern-basis; workaround available in FAQ
     + timeout handlers now also can exp_continue
     + added 'raw_pty' option, also setting master to raw if isatty()
+
+1.13_04 2002-01-18
+
+1.13_02 2001-11-30
+
+1.13_01 2001-11-26
 
 1.13
     ! changed tests to check out pty behaviour (max. string length)
@@ -81,7 +87,7 @@
     ! spawn() now uses IO::Pty spawn, thus exec errors are reported and
       ssh should work too!
 
-1.12
+1.12 2001-09-06
     ! exp_Max_Accum didn't work for interact.
     - removed soft_close() from DESTROY.  Being overly nice to a doomed process
       doesn't pay off.  Old behaviour is available via
@@ -93,7 +99,7 @@
       or didn't know that it was there.
     + added a hook for log_file: can be set to a code ref.
 
-1.11
+1.11 2001-02-20
     Bugs fixed:
     ! max_accum (match_max) finally really restricts the match-buffer-size.
     ! expect() didn't return the correct error state upon EOF
@@ -131,20 +137,20 @@
     
       (suggested by horos@earth.he.net)
 
-1.10
+1.10 2000-11-22
     I cannot believe it: a syntax error in Expect.pm slipped through 
       (probably when I changed the version number after testing the patches),
       forcing me to do anouther release. >:-(
 
-1.09
+1.09 2000-11-21
     Various small bugfixes: exp_before didn't get set on timeout,
       the expect call didn't return on matching EOF, spawn didn't die when
       exec failed, Expect crashed in certain cases.
 
-1.08
+1.08 2000-09-20
     Added multi-match functionality (see docu)  --Roland
 
-1.07
+1.07 1998-07-12
     Changed the ver by .01 so I could get it up on CPAN :P
 
 1.06
@@ -153,7 +159,7 @@
 1.05
     Added debug level '3'. Fixed/added to tutorial, fixed a couple of minor bugs.
 
-1.04
+1.04 1998-03-12
     Made all handles exp_inited autoflush. IO::Pty does the spawned 
       processes for us. All regexp patterns passed to expect() are now 
       multiline matched-- this makes matching ^ work for the beginning of lines.
@@ -171,7 +177,7 @@
       strings indicating the subsequent pattern is to be matched as a regular
       expression.
 
-1.01
+1.01 1997-12-15
     Dropped process still alive during expect. Sometimes the process dies
       before the handle finishes getting read. Fixed a typo that caused a response
       of 'child process died' if a successfull pattern had a null value.
