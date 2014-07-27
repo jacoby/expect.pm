@@ -12,10 +12,11 @@ use Expect;
 #$Expect::Exp_Internal = 1;
 #$Expect::Debug = 1;
 
-diag "Basic tests...";
 
 subtest perl => sub {
+  diag "Basic tests...";
   plan tests => 4;
+
   my $exp = Expect->spawn("$Perl -v");
   ok(defined $exp);
   $exp->log_user(0);
@@ -24,10 +25,11 @@ subtest perl => sub {
   ok(not $exp->expect(3, "Copyright"));
 };
 
-diag "Testing exec failure...";
 
 subtest exec_failure => sub {
+  diag "Testing exec failure...";
   plan tests => 6;
+
   my $exp = Expect->new;
   ok(defined $exp);
   $exp->log_stdout(0);
@@ -45,22 +47,26 @@ subtest exec_failure => sub {
   is($res, 1);
 };
 
-diag "Testing exp_continue...";
 
 subtest exp_continue => sub {
-  plan tests => 5;
+  diag "Testing exp_continue...";
+  plan tests => 1;
+
   my $exp = Expect->new($Perl . q{ -e 'foreach (qw(A B C D End)) { print "$_\n"; }' });
   my $state = "A";
+  my @val;
   $exp->expect(2,
-	       [ "[ABCD]" => sub { my $self = shift;
-				   ok($self->match eq $state);
-				   $state++;
-				   exp_continue;
-				 } ],
-	       [ "End" => sub { ok($state eq "E"); } ],
-               [ eof => sub { print "EOF\n"; ok(0); } ],
-               [ timeout => sub { print "TIMEOUT\n"; ok(0);} ],
-              );
+       [ "[ABCD]" => sub {
+               my $self = shift;
+               push @val, $self->match;
+               exp_continue;
+           }
+       ],
+       [ "End"   => sub { push @val, 'End';     } ],
+       [ eof     => sub { push @val, 'eof';     } ],
+       [ timeout => sub { push @val, 'timeout'; } ],
+  );
+  is_deeply \@val, [qw(A B C D End)], '5 states of exp_continue';
   $exp->hard_close();
 };
 
