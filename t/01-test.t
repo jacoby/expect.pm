@@ -2,7 +2,7 @@
 use strict;
 $^W = 1;			# warnings too
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use File::Temp qw(tempdir);
 my $tempdir = tempdir( CLEANUP => 1 );
 
@@ -337,7 +337,7 @@ subtest signal => sub {
   ok($hi == 15 or $lo == 15);
 };
 
-print <<__EOT__;
+diag <<__EOT__;
 
 Checking if EOF on pty slave is correctly reported to master...
 (this fails on about 50% of the supported systems, so don't panic!
@@ -345,14 +345,17 @@ Checking if EOF on pty slave is correctly reported to master...
 
 __EOT__
 
-{
+subtest eof_on_pty => sub {
+  plan tests => 1;
   my $exp = Expect->new($Perl . q{ -e 'close STDIN; close STDOUT; close STDERR; sleep 3;'});
+  my $res;
   $exp->expect(2,
-               [ eof => sub { print "EOF\n"; } ],
-               [ timeout => sub { print "TIMEOUT\nSorry, you may not notice if the spawned process closes the pty.\n"; } ],
+               [ eof     => sub { $res = 'eof' } ],
+               [ timeout => sub { $res = 'timeout' } ], # print "TIMEOUT\nSorry, you may not notice if the spawned process closes the pty.\n"; } ],
               );
+  is $res, 'timeout';
   $exp->hard_close();
-}
+};
 
 
 use Test::Builder;
@@ -363,3 +366,4 @@ were given.  Expect probably is still completely usable!!
 __EOT__
 
 exit(0);
+
