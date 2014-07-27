@@ -1,23 +1,26 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-
-my $Is_Beta = 0;
 
 WriteMakefile(
-	      'NAME'	     => 'Expect',
-	      'VERSION_FROM' => 'lib/Expect.pm',
-	      'PREREQ_PM'    => {
-                                  'IO::Tty' => 1.03,
-                                  'IO::Pty' => 1.03,
-				},
-	      'clean'        => { 'FILES' => '*.log' },
-	      'dist'         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-	      );
+	NAME         => 'Expect',
+	VERSION_FROM => 'lib/Expect.pm',
+	PREREQ_PM    => {
+		'IO::Tty' => 1.03,
+		'IO::Pty' => 1.03,
+	},
+	ABSTRACT_FROM => 'lib/Expect.pm',
+	clean        => { 'FILES' => '*.log' },
+	dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+	($ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE'=> 'perl') : ()),
+	(eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'http://github.com/szabgab/expect.pm.git',
+				web  => 'http://github.com/szabgab/expect.pm',
+			}
+		}})
+		: ()
+	),
+);
 
-print <<'__EOT__' if $Is_Beta;
-**********************************************************************
-WARNING: this is a BETA version.  If it works, good for you, if not,
-tell me, <RGiersig@cpan.org> about it and I'll see what I can do.
-**********************************************************************
-__EOT__
