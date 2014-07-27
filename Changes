@@ -292,4 +292,9 @@ Expect v1.20
 + now included example ssh.pl in MANIFEST so it gets packaged :-(
 
 
+1.22 
+	New mainainer (Gabor Szabo)
+	Merge .pod and .pm
+	Move the test and the code to standard location in tha distribution.
+
 
