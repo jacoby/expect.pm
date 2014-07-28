@@ -2076,11 +2076,11 @@ makes the pty transparently act like a bidirectional pipe.
 
 =item Simple interface
 
-  $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
-
 Given $timeout in seconds Expect will wait for $object's handle to produce
 one of the match_patterns, which are matched exactly by default. If you
 want a regexp match, prefix the pattern with '-re'.
+
+  $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
 
 Due to o/s limitations $timeout should be a round number. If $timeout
 is 0 Expect will check one time to see if $object's handle contains
@@ -2088,7 +2088,7 @@ any of the match_patterns. If $timeout is undef Expect
 will wait forever for a pattern to match.
 
 If called in a scalar context, expect() will return the position of
-the matched pattern within $match_patterns, or undef if no pattern was
+the matched pattern within @matched_patterns, or undef if no pattern was
 matched. This is a position starting from 1, so if you want to know
 which of an array of @matched_patterns matched you should subtract one
 from the return value.
@@ -2097,8 +2097,10 @@ If called in an array context expect() will return
 ($matched_pattern_position, $error, $successfully_matching_string,
 $before_match, and $after_match).
 
-$matched_pattern_position will contain the value that would have been
-returned if expect() had been called in a scalar context. $error is
+C<$matched_pattern_position> will contain the value that would have been
+returned if expect() had been called in a scalar context.
+
+C<$error> is
 the error that occurred that caused expect() to return. $error will
 contain a number followed by a string equivalent expressing the nature
 of the error. Possible values are undef, indicating no error,
@@ -2109,6 +2111,10 @@ and '4:$!' indicating whatever error was set in $ERRNO during the last
 read on $object's handle or during select(). All handles indicated by
 set_group plus STDOUT will have all data to come out of $object
 printed to them during expect() if log_group and log_stdout are set.
+
+C<$successfully_matching_string>
+C<$before_match>
+C<$after_match>
 
 Changed from older versions is the regular expression handling. By
 default now all strings passed to expect() are treated as literals. To
@@ -3045,8 +3051,6 @@ And then $process->expect($timeout,'____END____','other','patterns');
   }
 
   $exp->interact();
-
-
 
 =head1 HOMEPAGE
 
