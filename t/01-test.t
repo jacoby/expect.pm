@@ -270,13 +270,15 @@ _EOT_
 subtest max_line_length => sub {
 	plan tests => 1;
 
-	my $exp = Expect->new("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
+	my $exp = Expect->new(qq{$Perl -ne 'chomp; sleep 0; print scalar reverse, "\\n"'})
 		or die "Cannot spawn $Perl: $!\n";
 
 	$exp->log_stdout(0);
 	my $randstring =
 		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
-	my $maxlen;
+	diag 'Length: ' . length($randstring);
+	my $status = '';
+	my $maxlen = 0;
 	my $exitloop;
 	foreach my $len ( 1 .. length($randstring) ) {
 		#print "$len\r";
@@ -290,14 +292,16 @@ subtest max_line_length => sub {
 		if ($@) {
 			ok( $maxlen > 80 );
 			diag "Warning: your default pty blocks when sending more than $maxlen bytes per line!";
+			$status = 'block';
 			$exitloop = 1;
 			last;
 		}
 		$exp->expect(
 			10,
 			[ quotemeta($rev) => sub { $maxlen = $len; } ],
-			[   timeout => sub {
-					print "Warning: your default pty can only handle $maxlen bytes at a time!\n";
+			[ timeout => sub {
+					diag "Warning: your default pty can only handle $maxlen bytes at a time!\n";
+					$status = 'limit';
 					$exitloop = 1;
 				}
 			],
@@ -306,7 +310,8 @@ subtest max_line_length => sub {
 	}
 	diag "Good, your default pty can handle lines of at least " . length($randstring) . " bytes at a time."
 		if not $exitloop;
-	ok( $maxlen > 100 );
+	diag $status;
+	cmp_ok $maxlen, '>', 100;
 };
 
 subtest controlling_termnal => sub {
@@ -361,8 +366,8 @@ subtest exit_status => sub {
 	is $val, 'test_pid';
 	my $status = $exp->soft_close();
 	diag sprintf "soft_close: 0x%04X\n", $status;
-	ok( $exp->exitstatus() == $status );
-	ok( ( ( $status >> 8 ) & 0x7F ) == 42 );
+	is $exp->exitstatus(), $status;
+	is( ( ( $status >> 8 ) & 0x7F ), 42);
 };
 
 
