@@ -173,20 +173,23 @@ subtest raw_reversing => sub {
 	diag "isatty(\$exp): " . (POSIX::isatty($exp) ? "YES" : "NO");
 
 	$exp->raw_pty(1);
-	$exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
+	$exp->spawn(qq{$Perl -ne 'chomp; sleep 0; print scalar reverse, "\\n"'})
 		or die "Cannot spawn $Perl: $!\n";
 	my $called = 0;
 	$exp->log_file( sub { $called++; } );
 	foreach my $s (@Strings) {
+		my $val = '';
 		my $rev = scalar reverse $s;
 		$exp->send("$s\n");
 		$exp->expect(
 			10,
-			[ quotemeta($rev) => sub { ok(1); } ],
-			[ timeout => sub { ok(0); die "Timeout"; } ],
-			[ eof     => sub { ok(0); die "EOF"; } ],
+			[ quotemeta($rev) => sub { $val = 'match'; } ],
+			[ timeout => sub { $val = 'timeout' } ], # was die!
+			[ eof     => sub { $val = 'eof'; } ],    # was die!
 		);
+		is $val, 'match', $s;
 	}
+	diag "Called: $called";
 	cmp_ok $called, '>=', @Strings;
 	$exp->log_file(undef);
 
@@ -198,15 +201,18 @@ subtest raw_reversing => sub {
 		my $rev = scalar reverse $s;
 		my $now = time;
 		$exp->send_slow( $delay, "$s\n" );
+		my $val = '';
 		$exp->expect(
 			10,
-			[ quotemeta($rev) => sub { ok(1); } ],
-			[ timeout => sub { ok(0); die "Timeout"; } ],
-			[ eof     => sub { ok(0); die "EOF"; } ],
+			[ quotemeta($rev) => sub { $val = 'match'; } ],
+			[ timeout => sub { $val = 'timeout'; } ],
+			[ eof     => sub { $val = 'eof'; } ],
 		);
+		is $val, 'match', $s;
 		my $dur = time - $now;
 		cmp_ok $dur, '>', length($s) * $delay;
 	}
+	diag "Called: $called";
 	cmp_ok $called, '>=', @Strings;
 	$exp->log_file(undef);
 };
