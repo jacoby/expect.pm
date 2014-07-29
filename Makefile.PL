@@ -6,9 +6,20 @@ WriteMakefile(
 	PREREQ_PM    => {
 		'IO::Tty' => 1.11,
 		'IO::Pty' => 1.11,
+
+		# standard modules:
+		'POSIX'      => 0,
+		'Fcntl'      => 0,
+		'Carp'       => 0,
+		'IO::Handle' => 0,
+		'Exporter'   => 0,
+		'Errno'      => 0,
 	},
 	BUILD_REQUIRES => {
 		'Test::More'   => '1.00',
+
+		# standard modules:
+		'File::Temp' => 0,
 	},
 	ABSTRACT_FROM => 'lib/Expect.pm',
 	clean        => { 'FILES' => '*.log' },
