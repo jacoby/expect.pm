@@ -1,4 +1,3 @@
-
 use strict;
 use warnings;
 
@@ -163,12 +162,7 @@ subtest raw_reversing => sub {
 
 	#    my $exp = Expect->new("$Perl -MIO::File -ne 'BEGIN {\$|=1; \$in = IO::File->new( \">reverse.in\" ) or die; \$in->autoflush(1); \$out = IO::File->new( \">reverse.out\" ) or die; \$out->autoflush(1); } chomp; print \$in \"\$_\\n\"; \$_ = scalar reverse; print \"\$_\\n\"; print \$out \"\$_\\n\"; '");
 
-	print "isatty(\$exp): ";
-	if ( POSIX::isatty($exp) ) {
-		print "YES\n";
-	} else {
-		print "NO\n";
-	}
+	diag "isatty(\$exp): " . (POSIX::isatty($exp) ? "YES" : "NO");
 
 	$exp->raw_pty(1);
 	$exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
@@ -345,17 +339,19 @@ subtest controlling_termnal => sub {
 
 subtest exit_status => sub {
 	diag "Checking if exit status is returned correctly...";
-	plan tests => 2;
+	plan tests => 3;
 
 	my $exp = Expect->new( $Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; exit(42);'} );
+	my $val = '';
 	$exp->expect(
 		10,
-		[ qr/Expect_test_pid:/, sub { my $self = shift; } ],
-		[ eof     => sub { print "eof\n"; } ],
-		[ timeout => sub { print "timeout\n"; } ],
+		[ qr/Expect_test_pid:/, sub { my $self = shift; $val = 'test_pid'; } ],
+		[ eof     => sub { $val = "eof"; } ],
+		[ timeout => sub { $val = "timeout"; } ],
 	);
+	is $val, 'test_pid';
 	my $status = $exp->soft_close();
-	printf "soft_close: 0x%04X\n", $status;
+	diag sprintf "soft_close: 0x%04X\n", $status;
 	ok( $exp->exitstatus() == $status );
 	ok( ( ( $status >> 8 ) & 0x7F ) == 42 );
 };
@@ -363,17 +359,19 @@ subtest exit_status => sub {
 
 subtest signal => sub {
 	diag "Checking if signal exit status is returned correctly...";
-	plan tests => 2;
+	plan tests => 3;
 
 	my $exp = Expect->new( $Perl . q{ -e 'print "Expect_test_pid: $$\n"; sleep 2; kill 15, $$;'} );
+	my $val = '';
 	$exp->expect(
 		10,
-		[ qr/Expect_test_pid:/, sub { my $self = shift; } ],
-		[ eof     => sub { print "eof\n"; } ],
-		[ timeout => sub { print "timeout\n"; } ],
+		[ qr/Expect_test_pid:/, sub { my $self = shift; $val = 'test_pid'; } ],
+		[ eof     => sub { $val = "eof"; } ],
+		[ timeout => sub { $val = "timeout"; } ],
 	);
+	is $val, 'test_pid';
 	my $status = $exp->soft_close();
-	printf "soft_close: 0x%04X\n", $status;
+	diag sprintf "soft_close: 0x%04X", $status;
 	ok( $exp->exitstatus() == $status );
 	my ( $hi, $lo ) = ( ( $status >> 8 ) & 0x7F, $status & 0x7F );
 
@@ -396,10 +394,9 @@ subtest eof_on_pty => sub {
 	$exp->expect(
 		2,
 		[ eof     => sub { $res = 'eof' } ],
-		[ timeout => sub { $res = 'timeout' } ]
-		, # print "TIMEOUT\nSorry, you may not notice if the spawned process closes the pty.\n"; } ],
+		[ timeout => sub { $res = 'timeout' } ],
 	);
-	is $res, 'timeout';
+	is $res, 'timeout', "Sorry, you may not notice if the spawned process closes the pty.";
 	$exp->hard_close();
 };
 
