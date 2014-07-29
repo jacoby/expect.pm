@@ -2,6 +2,7 @@
     Refactoring test script.
     Eliminate indirect calls in the code and in the docs.
     Use Perl::Tidy to unify layout. 
+    IO::Tty prerequisite version 1.03 => 1.11
 
 1.22 2014-07-27
     New unofficial mainainer (Gabor Szabo)

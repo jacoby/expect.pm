@@ -4,8 +4,8 @@ WriteMakefile(
 	NAME         => 'Expect',
 	VERSION_FROM => 'lib/Expect.pm',
 	PREREQ_PM    => {
-		'IO::Tty' => 1.03,
-		'IO::Pty' => 1.03,
+		'IO::Tty' => 1.11,
+		'IO::Pty' => 1.11,
 	},
 	BUILD_REQUIRES => {
 		'Test::More'   => '1.00',
