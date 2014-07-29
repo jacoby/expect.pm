@@ -125,26 +125,34 @@ subtest notransfer => sub {
 	}
 
 	sleep(6);
+	my $val1 = '';
 	$exp->expect(
 		3,
-		[ "some" => sub { my $self = shift; ok(1); $self->set_accum( $self->after() ); } ],
-		[ eof     => sub { print "EOF\n";     ok(0); } ],
-		[ timeout => sub { print "TIMEOUT\n"; ok(0); } ],
+		[ 'some'  => sub { my $self = shift; $val1 = 'some'; $self->set_accum( $self->after() ); } ],
+		[ eof     => sub { $val1 = 'eof'; } ],
+		[ timeout => sub { $val1 = 'timeout'; } ],
 	);
+	is $val1, 'some';
+
+	my $val2 = '';
 	$exp->expect(
 		3,
-		[ "some"  => sub { ok(0); } ],
-		[ "other" => sub { my $self = shift; ok(1); $self->set_accum( $self->after() ); } ],
-		[ eof     => sub { print "EOF\n";     ok(0); } ],
-		[ timeout => sub { print "TIMEOUT\n"; ok(0); } ],
+		[ 'some'  => sub { $val2 = 'some'; } ],
+		[ 'other' => sub { $val2 = 'other'; my $self = shift; $self->set_accum( $self->after() ); } ],
+		[ eof     => sub { $val2 = 'eof'; } ],
+		[ timeout => sub { $val2 = 'timeout'; } ],
 	);
+	is $val2, 'other';
+
+	my $val3 = '';
 	$exp->expect(
 		3,
-		[ "some"  => sub { ok(0); } ],
-		[ "other" => sub { ok(0); } ],
-		[ eof     => sub { print "EOF\n"; ok(1); } ],
-		[ timeout => sub { print "TIMEOUT\n"; ok(0); } ],
+		[ "some"  => sub { $val3 = 'some'; } ],
+		[ "other" => sub { $val3 = 'other'; } ],
+		[ eof     => sub { $val3 = 'eof'; } ],
+		[ timeout => sub { $val3 = 'timeout'; } ],
 	);
+	is $val3, 'eof';
 };
 
 
