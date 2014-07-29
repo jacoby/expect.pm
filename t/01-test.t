@@ -277,12 +277,19 @@ _EOT_
 subtest max_line_length => sub {
 	plan tests => 1;
 
+	my $randstring =
+		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
+
+	test_reverse($randstring);
+};
+
+sub test_reverse {
+	my ($randstring) = @_;
+
 	my $exp = Expect->new(qq{$Perl -ne 'chomp; sleep 0; print scalar reverse, "\\n"'})
 		or die "Cannot spawn $Perl: $!\n";
 
 	$exp->log_stdout(0);
-	my $randstring =
-		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
 	diag 'Length: ' . length($randstring);
 	my $status = '';
 	my $maxlen = 0;
@@ -320,7 +327,7 @@ subtest max_line_length => sub {
 		if not $exitloop;
 	diag "Status: $status";
 	cmp_ok $maxlen, '>', 100;
-};
+}
 
 subtest controlling_termnal => sub {
 	diag "Testing controlling terminal...";
