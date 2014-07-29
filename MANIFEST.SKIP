@@ -39,5 +39,6 @@
 # Avoid archives of this distribution
 \bExpect-[\d\.\_]+
 .gitignore
+.*\.swp
 MYMETA.*
 
