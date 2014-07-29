@@ -18,6 +18,7 @@ use 5.006;
 
 package Expect;
 use strict;
+use warnings;
 
 use IO::Pty 1.03; # We need make_slave_controlling_terminal()
 use IO::Tty;
