@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use File::Temp qw(tempdir);
 use Expect;
 
@@ -158,7 +158,7 @@ subtest notransfer => sub {
 
 subtest raw_reversing => sub {
 	diag "Testing raw reversing...";
-	plan tests => 12;
+	plan tests => 11;
 
 	my @Strings = (
 		"The quick brown fox jumped over the lazy dog.",
@@ -187,7 +187,7 @@ subtest raw_reversing => sub {
 			[ eof     => sub { ok(0); die "EOF"; } ],
 		);
 	}
-	ok( $called >= @Strings );
+	cmp_ok $called, '>=', @Strings;
 	$exp->log_file(undef);
 
 	# now with send_slow
@@ -205,12 +205,14 @@ subtest raw_reversing => sub {
 			[ eof     => sub { ok(0); die "EOF"; } ],
 		);
 		my $dur = time - $now;
-		ok( $dur > length($s) * $delay );
+		cmp_ok $dur, '>', length($s) * $delay;
 	}
-	ok( $called >= @Strings );
+	cmp_ok $called, '>=', @Strings;
 	$exp->log_file(undef);
+};
 
-
+subtest system_dependent => sub {
+	plan tests => 1;
 	diag <<_EOT_;
 
 ------------------------------------------------------------------------------
@@ -220,6 +222,11 @@ subtest raw_reversing => sub {
 _EOT_
 
 	# we check if the raw pty can handle large chunks of text at once
+
+	my $exp = Expect->new;
+	$exp->raw_pty(1);
+	$exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
+		or die "Cannot spawn $Perl: $!\n";
 
 	my $randstring =
 		'fakjdf ijj845jtirg8e 4jy8 gfuoyhjgt8h gues9845th guoaeh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshftuehgfusand987vgh afugh 8h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf hajksdhf jkahsd fjkh asdHJKGDSGFKLZSTRJKSGOSJDFKGHSHGDFJGDSFJKHGSDFHJGSDKFJGSDGFSHJDGFljkhf lakjsdh fkjahs djfk hasjkdh fjklahs dfkjhasdjkf hajksdh fkjah sdjfk hasjkdh fkjashd fjkha sdjkfhehurthuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5$R%/4r76 5&/% R79 5 )/&';
