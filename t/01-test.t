@@ -273,7 +273,7 @@ subtest max_line_length => sub {
 
 	$exp->log_stdout(0);
 	my $randstring =
-		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
+		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"Â§Ã¤#Ã¼ÃŸw';
 	my $maxlen;
 	my $exitloop;
 	foreach my $len ( 1 .. length($randstring) ) {
