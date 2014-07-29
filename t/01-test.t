@@ -212,61 +212,15 @@ subtest raw_reversing => sub {
 };
 
 subtest system_dependent => sub {
+	diag 'Check if the raw pty can handle large chunks of text at once';
 	plan tests => 1;
-	diag <<_EOT_;
-
-------------------------------------------------------------------------------
->  The following tests check system-dependend behaviour, so even if some fail,
->  Expect might still be perfectly usable for you!
-------------------------------------------------------------------------------
-_EOT_
-
-	# we check if the raw pty can handle large chunks of text at once
-
-	my $exp = Expect->new;
-	$exp->raw_pty(1);
-	$exp->spawn("$Perl -ne 'chomp; sleep 0; print scalar reverse, \"\\n\"'")
-		or die "Cannot spawn $Perl: $!\n";
 
 	my $randstring =
 		'fakjdf ijj845jtirg8e 4jy8 gfuoyhjgt8h gues9845th guoaeh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshftuehgfusand987vgh afugh 8h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf hajksdhf jkahsd fjkh asdHJKGDSGFKLZSTRJKSGOSJDFKGHSHGDFJGDSFJKHGSDFHJGSDKFJGSDGFSHJDGFljkhf lakjsdh fkjahs djfk hasjkdh fjklahs dfkjhasdjkf hajksdh fkjah sdjfk hasjkdh fkjashd fjkha sdjkfhehurthuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5$R%/4r76 5&/% R79 5 )/&';
-	my $maxlen;
-	$exp->log_stdout(0);
-	$exp->log_file("$tempdir/test.log");
-	my $exitloop;
-	$SIG{ALRM} = sub { die "TIMEOUT on send" };
 
-	foreach my $len ( 1 .. length($randstring) ) {
-		#print "$len\r";
-		my $s = substr( $randstring, 0, $len );
-		my $rev = scalar reverse $s;
-		eval {
-			alarm(10);
-			$exp->send("$s\n");
-			alarm(0);
-		};
-		if ($@) {
-			ok( $maxlen > 80 );
-			print "Warning: your raw pty blocks when sending more than $maxlen bytes!\n";
-			$exitloop = 1;
-			last;
-		}
-		$exp->expect(
-			10,
-			[ quotemeta($rev) => sub { $maxlen = $len; } ],
-			[   timeout => sub {
-					ok( $maxlen > 160 );
-					print "Warning: your raw pty can only handle $maxlen bytes at a time!\n";
-					$exitloop = 1;
-				}
-			],
-			[ eof => sub { ok(0); die "EOF"; } ],
-		);
-		last if $exitloop;
-	}
-	$exp->log_file(undef);
-	diag "Good, your raw pty can handle at least " . length($randstring) . " bytes at a time." if not $exitloop;
-	cmp_ok $maxlen, '>', 160;
+	my $exp = Expect->new;
+	$exp->raw_pty(1);
+	test_reverse($exp, $randstring, 160, 'raw');
 };
 
 # Now test for the max. line length. Some systems are limited to ~255
@@ -275,21 +229,32 @@ _EOT_
 # to avoid that.
 
 subtest max_line_length => sub {
+	diag 'Check if the default pty can handle large chunks of text at once';
 	plan tests => 1;
 
 	my $randstring =
 		'Fakjdf ijj845jtirg8 gfuoyhjgt8h gues9845th guoaeh gt9vgh afugh 8h 98H 97BH 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a slkf ksdheq@f jkahsd fjkh%&/"§ä#üßw';
 
-	test_reverse($randstring);
+	my $exp = Expect->new;
+	test_reverse($exp, $randstring, 100, 'default');
 };
 
 sub test_reverse {
-	my ($randstring) = @_;
+	my ($exp, $randstring, $min, $type) = @_;
 
-	my $exp = Expect->new(qq{$Perl -ne 'chomp; sleep 0; print scalar reverse, "\\n"'})
+	diag <<_EOT_;
+------------------------------------------------------------------------------
+  The following tests check system-dependend behaviour, so even if some fail,
+  Expect might still be perfectly usable for you!
+------------------------------------------------------------------------------
+_EOT_
+
+	$exp->spawn(qq{$Perl -ne 'chomp; sleep 0; print scalar reverse, "\\n"'})
 		or die "Cannot spawn $Perl: $!\n";
+	$SIG{ALRM} = sub { die "TIMEOUT on send" };
 
 	$exp->log_stdout(0);
+	$exp->log_file("$tempdir/test.log");
 	diag 'Length: ' . length($randstring);
 	my $status = '';
 	my $maxlen = 0;
@@ -314,7 +279,7 @@ sub test_reverse {
 			10,
 			[ quotemeta($rev) => sub { $maxlen = $len; $status = 'match' } ],
 			[ timeout => sub {
-					diag "Warning: your default pty can only handle $maxlen bytes at a time!\n";
+					diag "Warning: your $type pty can only handle $maxlen bytes at a time!\n";
 					$status = 'limit';
 					$exitloop = 1;
 				}
@@ -323,10 +288,12 @@ sub test_reverse {
 		);
 		last if $exitloop;
 	}
-	diag "Good, your default pty can handle lines of at least " . length($randstring) . " bytes at a time."
+	diag "Good, your $type pty can handle lines of at least " . length($randstring) . " bytes at a time."
 		if not $exitloop;
 	diag "Status: $status";
-	cmp_ok $maxlen, '>', 100;
+	cmp_ok $maxlen, '>', $min;
+	$SIG{ALRM} = 'DEFAULT';
+
 }
 
 subtest controlling_termnal => sub {
