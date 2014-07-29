@@ -20,7 +20,7 @@ package Expect;
 use strict;
 use warnings;
 
-use IO::Pty 1.03; # We need make_slave_controlling_terminal()
+use IO::Pty 1.11; # We need make_slave_controlling_terminal()
 use IO::Tty;
 
 use POSIX qw(:sys_wait_h :unistd_h); # For WNOHANG and isatty
