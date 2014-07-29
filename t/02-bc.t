@@ -11,6 +11,8 @@ subtest raw_pty_bc => sub {
 		plan skip_all => "Need to have $bc installed to run this test";
 	}
 
+	diag "This test will almost certainly fail on OSX. You can install the module skipping this test, but please report the failure.";
+
 	plan tests => 1;
 
 	#$Expect::Debug = 1;
