@@ -258,8 +258,8 @@ _EOT_
 		last if $exitloop;
 	}
 	$exp->log_file(undef);
-	diag "Good, your raw pty can handle at least " . length($randstring) . " bytes at a time.\n" if not $exitloop;
-	ok( $maxlen > 160 );
+	diag "Good, your raw pty can handle at least " . length($randstring) . " bytes at a time." if not $exitloop;
+	cmp_ok $maxlen, '>', 160;
 };
 
 # Now test for the max. line length. Some systems are limited to ~255
@@ -290,7 +290,7 @@ subtest max_line_length => sub {
 			alarm(0);
 		};
 		if ($@) {
-			ok( $maxlen > 80 );
+			#ok( $maxlen > 80 );
 			diag "Warning: your default pty blocks when sending more than $maxlen bytes per line!";
 			$status = 'block';
 			$exitloop = 1;
@@ -298,19 +298,20 @@ subtest max_line_length => sub {
 		}
 		$exp->expect(
 			10,
-			[ quotemeta($rev) => sub { $maxlen = $len; } ],
+			[ quotemeta($rev) => sub { $maxlen = $len; $status = 'match' } ],
 			[ timeout => sub {
 					diag "Warning: your default pty can only handle $maxlen bytes at a time!\n";
 					$status = 'limit';
 					$exitloop = 1;
 				}
 			],
-			[ eof => sub { ok(0); die "EOF"; } ],
+			[ eof => sub { $status = 'eof'; die "EOF"; } ],
 		);
+		last if $exitloop;
 	}
 	diag "Good, your default pty can handle lines of at least " . length($randstring) . " bytes at a time."
 		if not $exitloop;
-	diag $status;
+	diag "Status: $status";
 	cmp_ok $maxlen, '>', 100;
 };
 
