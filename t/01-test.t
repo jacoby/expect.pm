@@ -211,7 +211,7 @@ subtest raw_reversing => sub {
 	$exp->log_file(undef);
 
 
-	print <<_EOT_;
+	diag <<_EOT_;
 
 ------------------------------------------------------------------------------
 >  The following tests check system-dependend behaviour, so even if some fail,
@@ -230,7 +230,7 @@ _EOT_
 	$SIG{ALRM} = sub { die "TIMEOUT on send" };
 
 	foreach my $len ( 1 .. length($randstring) ) {
-		print "$len\r";
+		#print "$len\r";
 		my $s = substr( $randstring, 0, $len );
 		my $rev = scalar reverse $s;
 		eval {
@@ -258,7 +258,7 @@ _EOT_
 		last if $exitloop;
 	}
 	$exp->log_file(undef);
-	print "Good, your raw pty can handle at least " . length($randstring) . " bytes at a time.\n" if not $exitloop;
+	diag "Good, your raw pty can handle at least " . length($randstring) . " bytes at a time.\n" if not $exitloop;
 	ok( $maxlen > 160 );
 };
 
@@ -279,7 +279,7 @@ subtest max_line_length => sub {
 	my $maxlen;
 	my $exitloop;
 	foreach my $len ( 1 .. length($randstring) ) {
-		print "$len\r";
+		#print "$len\r";
 		my $s = substr( $randstring, 0, $len );
 		my $rev = scalar reverse $s;
 		eval {
@@ -289,7 +289,7 @@ subtest max_line_length => sub {
 		};
 		if ($@) {
 			ok( $maxlen > 80 );
-			print "Warning: your default pty blocks when sending more than $maxlen bytes per line!\n";
+			diag "Warning: your default pty blocks when sending more than $maxlen bytes per line!";
 			$exitloop = 1;
 			last;
 		}
@@ -304,7 +304,7 @@ subtest max_line_length => sub {
 			[ eof => sub { ok(0); die "EOF"; } ],
 		);
 	}
-	print "Good, your default pty can handle lines of at least " . length($randstring) . " bytes at a time.\n"
+	diag "Good, your default pty can handle lines of at least " . length($randstring) . " bytes at a time."
 		if not $exitloop;
 	ok( $maxlen > 100 );
 };
@@ -320,6 +320,7 @@ subtest controlling_termnal => sub {
 
 	my $pwd = "pAsswOrd";
 	$exp->log_file("$tempdir/test_dev_tty.log");
+	my $val = '';
 	$exp->expect(
 		10,
 		[   qr/Expect_test_prompt:/,
@@ -335,13 +336,13 @@ subtest controlling_termnal => sub {
 				my $self = shift;
 				my ($s) = $self->matchlist;
 				chomp $s;
-				print "match: $s\n";
-				ok( $s eq uc($pwd) );
+				$val = $s;
 			}
 		],
-		[ eof     => sub { ok(0); die "EOF"; } ],
-		[ timeout => sub { ok(0); die "Timeout"; } ],
+		[ eof     => sub { $val = 'eof'; die "EOF"; } ],
+		[ timeout => sub { $val = 'timeout'; die "Timeout"; } ],
 	);
+	is $val, uc($pwd);
 };
 
 
