@@ -10,10 +10,13 @@ subtest raw_pty_bc => sub {
 	if ( not -x $bc ) {
 		plan skip_all => "Need to have $bc installed to run this test";
 	}
+	if ($^O =~ /^(openbsd|netbsd|freebsd|darwin)$/) {
+		diag "This test will almost certainly fail on \$^O == \$Config{'osname'} == '$^O'. You can install the module skipping this test, but please report the failure.";
+		#plan skip_all => "This test fails on $^O";
+	}
 
-	diag "This test will almost certainly fail on OSX. You can install the module skipping this test, but please report the failure.";
 
-	plan tests => 1;
+	plan tests => 2;
 
 	#$Expect::Debug = 1;
 
@@ -21,11 +24,21 @@ subtest raw_pty_bc => sub {
 	$e->raw_pty(1);
 
 	$e->spawn("bc") or die "Cannot run bc\n";
-	$e->expect( 1, [qr/warranty'\./] ) or die "no warranty\n";
+	my $warranty;
+	$e->expect( 1, [qr/warranty'\./ => sub { $warranty = 1 } ] );
+	ok $warranty, 'warranty found' or do {
+		diag $e->before;
+		exit(-1);
+	};
 	$e->send("23+7\n");
-	$e->expect( 1, [qr/\d+/] ) or die "no sum\n";
+	my $num;
+	$e->expect( 1, [qr/\d+/ => sub { $num = 1 }] );
+	ok $num, 'number found' or do {
+		diag $e->before;
+		exit(-1);
+	};
 	my $match = $e->match;
-	is $match, 30;
+	is $match, 30, 'the number';
 	$e->send("quit\n");
 };
 
