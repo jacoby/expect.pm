@@ -19,13 +19,13 @@ diag "Test created for https://rt.cpan.org/Ticket/Display.html?id=62359 relaed t
 
 {
 	$e->send("abc\n");
-	$e->expect(3, [q/cba/ => sub { push @reply, 'cba' } ]);
+	$e->expect(3, [qr/cba/ => sub { push @reply, 'cba' } ]);
 }
 
 {
 	$e->log_file($logfile, "w");
 	$e->send("hello\n");
-	$e->expect(3, [q/olleh/ => sub { push @reply, 'olleh' } ]);
+	$e->expect(3, [qr/olleh/ => sub { push @reply, 'olleh' } ]);
 
 	my $log_before = slurp($logfile);
 	is $log_before, "olleh\n", 'logfile';  # I am not sure if we can really expect this to be already written (buffering?)
@@ -37,7 +37,7 @@ diag "Test created for https://rt.cpan.org/Ticket/Display.html?id=62359 relaed t
 
 {
 	$e->send("world\n");
-	$e->expect(3, [q/dlrow/ => sub { push @reply, 'dlrow' } ]);
+	$e->expect(3, [qr/dlrow/ => sub { push @reply, 'dlrow' } ]);
 	#$e->log_file(undef);
 	my $log = slurp($logfile);
 	is $log, "olleh\n", 'logfile';
@@ -46,7 +46,7 @@ diag "Test created for https://rt.cpan.org/Ticket/Display.html?id=62359 relaed t
 {
 	$e->log_file($logfile, "w");
 	$e->send("zorg\n");
-	$e->expect(3, [q/groz/ => sub { push @reply, 'groz' } ]);
+	$e->expect(3, [qr/groz/ => sub { push @reply, 'groz' } ]);
 
 	$e->log_file(undef);
 	my $log = slurp($logfile);
