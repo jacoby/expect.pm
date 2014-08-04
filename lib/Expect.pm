@@ -36,7 +36,7 @@ use Errno;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.23';
+	$Expect::VERSION = '1.24';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
