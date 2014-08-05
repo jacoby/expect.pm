@@ -16,7 +16,7 @@ subtest raw_pty_bc => sub {
 	}
 
 
-	plan tests => 2;
+	plan tests => 3;
 
 	#$Expect::Debug = 1;
 
