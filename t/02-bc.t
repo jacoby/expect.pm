@@ -28,14 +28,14 @@ subtest raw_pty_bc => sub {
 	$e->expect( 1, [qr/warranty'\./ => sub { $warranty = 1 } ] );
 	ok $warranty, 'warranty found' or do {
 		diag $e->before;
-		exit(-1);
+		return;
 	};
 	$e->send("23+7\n");
 	my $num;
 	$e->expect( 1, [qr/\d+/ => sub { $num = 1 }] );
 	ok $num, 'number found' or do {
 		diag $e->before;
-		exit(-1);
+		return;
 	};
 	my $match = $e->match;
 	is $match, 30, 'the number';
