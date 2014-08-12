@@ -36,7 +36,7 @@ use Errno;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.25';
+	$Expect::VERSION = '1.26';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
@@ -754,21 +754,21 @@ sub _multi_expect($$@) {
 					} elsif ( $pattern->[1] eq '-re' ) {
 
 						if ($Expect::Multiline_Matching) {
-							# We can't simply add a /s modifier, because this
-							# would break existing patterns which are assuming
-							# The internal (?s:.*?) is non-capturing but the external () captures.
 							@matchlist =
-								( ${*$exp}{exp_Accum}  =~ m/((?s:.*?))($pattern->[2])((?s:.*))/m);
+								( ${*$exp}{exp_Accum}  =~ m/($pattern->[2])/m);
 						} else {
 							@matchlist =
-								( ${*$exp}{exp_Accum} =~ m/(.*?)($pattern->[2])(.*)/);
+								( ${*$exp}{exp_Accum} =~ m/($pattern->[2])/);
 						}
 						if (@matchlist) {
 
 							# Matching regexp
-							$before = shift @matchlist;
 							$match  = shift @matchlist;
-							$after  = shift @matchlist;
+							my $start = index ${*$exp}{exp_Accum}, $match;
+							die 'The match could not be found' if $start == -1;
+							$before = substr ${*$exp}{exp_Accum}, 0, $start;
+							$after = substr ${*$exp}{exp_Accum}, $start + length($match);
+
 							${*$exp}{exp_Before} = $before;
 							${*$exp}{exp_Match}  = $match;
 							${*$exp}{exp_After}  = $after;

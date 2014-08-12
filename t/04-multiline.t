@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 21;
 use Expect;
 
 my $e = Expect->new;
@@ -23,6 +23,16 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->expect(1, ['^fed$']);
 	is $e->match, 'fed', 'match';
 	$e->clear_accum;
+}
+
+{
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', '(?:^X(.*d))');
+	is $e->match, 'XAnd', 'match';
+	is_deeply [$e->matchlist], ['And'], 'matchlist';
+	$e->clear_accum;
+
+	#[   qr/(?m:^uc:\s*(\w+))/,
 }
 
 {

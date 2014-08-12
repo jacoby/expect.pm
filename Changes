@@ -1,6 +1,10 @@
 1.26 2014-08-12
     Skip the bc test on OS-es where it has been failing.
     Stop inheriting from Exporter.
+    Eliminate $` and $' from the code. part of (RT # 61395)
+      This fix might break some existing code n some extreme cases
+      when the regex being matched has a lookbehind or a lookahead
+      at the edges.
 
 1.25 2014-08-05
     Fix test count.

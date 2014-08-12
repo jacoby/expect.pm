@@ -307,7 +307,7 @@ _EOT_
 
 subtest controlling_termnal => sub {
 	diag "Testing controlling terminal...";
-	plan tests => 1;
+	plan tests => 3;
 
 	my $exp =
 		Expect->new( $Perl
@@ -338,7 +338,14 @@ subtest controlling_termnal => sub {
 		[ eof     => sub { $val = 'eof'; } ],
 		[ timeout => sub { $val = 'timeout'; } ],
 	);
-	is $val, uc($pwd);
+	my $before = $exp->before;
+	$before =~ s/[\r\n]*$//;
+	is $before, " pAsswOrd", 'before';
+	my $after = $exp->after;
+	$after =~ s/[\r\n]*$//;
+	is $after,  "", 'after';
+
+	is $val, uc($pwd), 'uc';
 };
 
 
