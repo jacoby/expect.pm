@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 use Expect;
 
 my $e = Expect->new;
@@ -31,6 +31,14 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	is $e->match, 'XAnd', 'match';
 	$e->clear_accum;
 }
+
+{
+	$e->send("eroM\n");
+	$e->expect(1, '-re', '^M(..)e$');
+	is $e->match, 'More', 'match';
+	$e->clear_accum;
+}
+
 
 {
 	$e->send("dnAX\n");
