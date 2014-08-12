@@ -1,28 +1,44 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 18;
 use Expect;
 
 my $e = Expect->new;
 $e->raw_pty(1);
 $e->log_stdout(0);
-$e->spawn($^X . q{ -ne 'chomp; print "Hello\n"; print scalar reverse; print "\nWorld\n"' });
-
-#diag "Hello\ncba\nworld" =~ /^cba$/m;
+$e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print "\nWorld\nAnd\nMore\n"' });
 
 {
 	my $reply;
 	$e->send("abc\n");
 	$e->expect(1, ['^cba$' => sub { $reply = $e->match } ]);
 	is $reply, 'cba', 'reply';
+	is $e->before, "My\nHello\n";
+	is $e->after, "\nWorld\nAnd\nMore\n";
 }
 
 {
 	$e->send("def\n");
 	$e->expect(1, ['^fed$']);
 	is $e->match, 'fed', 'match';
+	$e->clear_accum;
 }
+
+{
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', '^X.*d$');
+	is $e->match, 'XAnd', 'match';
+	$e->clear_accum;
+}
+
+{
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', '^X(?s:.*)d$');
+	is $e->match, "XAnd\nWorld\nAnd", 'match';
+	$e->clear_accum;
+}
+
 
 {
 	$e->send("ghi\n");
@@ -30,6 +46,7 @@ $e->spawn($^X . q{ -ne 'chomp; print "Hello\n"; print scalar reverse; print "\nW
 	is $e->match, 'ihg', 'match';
 	$e->clear_accum;
 }
+
 
 TODO: {
 	local $TODO = 'Multiline_Maching does not work when qr// is passed. (Should it work?)';
@@ -73,6 +90,40 @@ TODO: {
 	}
 	is $e->match, 'ihg', 'maybe it should return ihg';
 }
+
+{
+	local $Expect::Multiline_Matching = 0;
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', '^X.*d$');
+	is $e->match, 'ihg', 'match';  # TODO: IMHO this should be undef as well.
+	$e->clear_accum;
+}
+
+{
+	local $Expect::Multiline_Matching = 0;
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', '^X(?s:.*)d$');
+	is $e->match, "ihg", 'match'; # TODO ??
+	$e->clear_accum;
+}
+
+
+{
+	local $Expect::Multiline_Matching = 0;
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', 'X.*d');   # no ^ and $
+	is $e->match, 'XAnd', 'match';
+	$e->clear_accum;
+}
+
+{
+	local $Expect::Multiline_Matching = 0;
+	$e->send("dnAX\n");
+	$e->expect(1, '-re', 'X(?s:.*)d'); # no ^ and $
+	is $e->match, "XAnd\nWorld\nAnd", 'match';
+	$e->clear_accum;
+}
+
 
 {
 	#diag 'localized $Expect::Multiline_Matching = 0;  has no effect after the block:';
