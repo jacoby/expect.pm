@@ -293,7 +293,7 @@ _EOT_
 					$exitloop = 1;
 				}
 			],
-			[ eof => sub { $status = 'eof'; die "EOF"; } ],
+			[ eof => sub { $status = 'eof';} ],
 		);
 		last if $exitloop;
 	}
@@ -335,8 +335,8 @@ subtest controlling_termnal => sub {
 				$val = $s;
 			}
 		],
-		[ eof     => sub { $val = 'eof'; die "EOF"; } ],
-		[ timeout => sub { $val = 'timeout'; die "Timeout"; } ],
+		[ eof     => sub { $val = 'eof'; } ],
+		[ timeout => sub { $val = 'timeout'; } ],
 	);
 	is $val, uc($pwd);
 };
