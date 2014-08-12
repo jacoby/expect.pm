@@ -753,27 +753,26 @@ sub _multi_expect($$@) {
 						}
 					} elsif ( $pattern->[1] eq '-re' ) {
 
-						# m// in array context promises to return an empty list
-						# but doesn't if the pattern doesn't contain brackets (),
-						# so we kludge around by adding an empty bracket
-						# at the end.
-
 						if ($Expect::Multiline_Matching) {
+							# We can't simply add a /s modifier, because this
+							# would break existing patterns which are assuming
+							# The internal (?s:.*?) is non-capturing but the external () captures.
 							@matchlist =
-								( ${*$exp}{exp_Accum} =~ m/$pattern->[2]()/m );
-							( $match, $before, $after ) = ( $&, $`, $' );
+								( ${*$exp}{exp_Accum}  =~ m/((?s:.*?))($pattern->[2])((?s:.*))/m);
 						} else {
 							@matchlist =
-								( ${*$exp}{exp_Accum} =~ m/$pattern->[2]()/ );
-							( $match, $before, $after ) = ( $&, $`, $' );
+								( ${*$exp}{exp_Accum} =~ m/(.*?)($pattern->[2])(.*)/);
 						}
 						if (@matchlist) {
 
 							# Matching regexp
+							$before = shift @matchlist;
+							$match  = shift @matchlist;
+							$after  = shift @matchlist;
 							${*$exp}{exp_Before} = $before;
 							${*$exp}{exp_Match}  = $match;
 							${*$exp}{exp_After}  = $after;
-							pop @matchlist; # remove kludged empty bracket from end
+							#pop @matchlist; # remove kludged empty bracket from end
 							@{ ${*$exp}{exp_Matchlist} } = @matchlist;
 							${*$exp}{exp_Match_Number} = $pattern->[0];
 							$exp_matched = $exp;
