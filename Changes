@@ -1,3 +1,6 @@
+1.26 2014-08-12
+    Skip the bc test on OS-es where it has been failing.
+
 1.25 2014-08-05
     Fix test count.
 
