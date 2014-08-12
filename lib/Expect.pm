@@ -27,12 +27,12 @@ use POSIX qw(:sys_wait_h :unistd_h); # For WNOHANG and isatty
 use Fcntl qw(:DEFAULT);              # For checking file handle settings.
 use Carp qw(cluck croak carp confess);
 use IO::Handle ();
-use Exporter   ();
+use Exporter   qw(import);
 use Errno;
 
 # This is necessary to make routines within Expect work.
 
-@Expect::ISA    = qw(IO::Pty Exporter);
+@Expect::ISA    = qw(IO::Pty);
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
