@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Expect;
 
 my $e = Expect->new;
@@ -65,14 +65,7 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->clear_accum;
 }
 
-
-TODO: {
-	local $TODO = 'Multiline_Maching does not work when qr// is passed. (Should it work?)';
-	my $reply;
-	$e->send("zorg\n");
-	$e->expect(1, [qr/^groz$/ => sub { $reply = $e->match } ]);
-	is $reply, 'groz';
-}
+my $last_match = $e->match;
 
 {
 	local $Expect::Multiline_Matching = 0;
@@ -95,7 +88,7 @@ TODO: {
 		# This sounds like a bug.
 		is $e->match, undef, 'match';
 	}
-	is $e->match, 'ihg', 'maybe it should return ihg';
+	is $e->match, $last_match, 'maybe it should return ihg';
 }
 
 {
@@ -106,14 +99,14 @@ TODO: {
 		local $TODO = 'Why does the match return ihg in this example?';
 		is $e->match, undef, 'match';
 	}
-	is $e->match, 'ihg', 'maybe it should return ihg';
+	is $e->match, $last_match, 'maybe it should return ihg';
 }
 
 {
 	local $Expect::Multiline_Matching = 0;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X.*d$');
-	is $e->match, 'ihg', 'match';  # TODO: IMHO this should be undef as well.
+	is $e->match, $last_match, 'match';  # TODO: IMHO this should be undef as well.
 	$e->clear_accum;
 }
 
@@ -121,7 +114,7 @@ TODO: {
 	local $Expect::Multiline_Matching = 0;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X(?s:.*)d$');
-	is $e->match, "ihg", 'match'; # TODO ??
+	is $e->match, $last_match, 'match'; # TODO ??
 	$e->clear_accum;
 }
 
@@ -149,4 +142,27 @@ TODO: {
 	$e->expect(1, ['^cba$']);
 	is $e->match, 'cba', 'match';
 }
+
+TODO: {
+	local $TODO = 'Multiline_Maching does not work when qr// is passed. (Should it work?)' if $] >= 5.010;
+	# see the regex subtest checking this thing and see http://www.perlmonks.org/?node_id=1097316
+	my $reply;
+	$e->send("zorg\n");
+	$e->expect(1, [qr/^groz$/ => sub { $reply = $e->match } ]);
+	is $reply, 'groz';
+}
+
+subtest regex => sub {
+	plan tests => 4;
+
+	my $str = "x\nab\ny";
+	my $re = '^ab$';
+	ok $str !~ /$re/,  're';
+	ok $str =~ /$re/m, 're/m';
+
+	my $qre = qr/^ab$/;
+	ok $str !~ /$qre/,  'qre';
+	ok $str !~ /$qre/m, 'qre/m';  # I think this will fail on 5.8.x
+};
+
 
