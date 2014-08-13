@@ -58,6 +58,7 @@ BEGIN {
 
 sub version {
 	my ($version) = shift;
+
 	warn "Version $version is later than $Expect::VERSION. It may not be supported"
 		if ( defined($version) && ( $version > $Expect::VERSION ) );
 
@@ -67,8 +68,8 @@ sub version {
 }
 
 sub new {
-
 	my ($class) = shift;
+
 	$class = ref($class) if ref($class); # so we can be called as $exp->new()
 
 	# Create the pty which we will use to pass process info.
@@ -92,6 +93,7 @@ sub new {
 
 sub spawn {
 	my ($class) = shift;
+
 	my $self;
 
 	if ( ref($class) ) {
@@ -192,12 +194,11 @@ sub spawn {
 }
 
 sub exp_init {
+	my ($class, $self) = @_;
 
 	# take a filehandle, for use later with expect() or interconnect() .
 	# All the functions are written for reading from a tty, so if the naming
 	# scheme looks odd, that's why.
-	my ($class) = shift;
-	my ($self)  = shift;
 	bless $self, $class;
 	croak "exp_init not passed a file object, stopped"
 		unless defined( $self->fileno() );
@@ -264,6 +265,7 @@ my %Readable_Vars = (
 
 sub AUTOLOAD {
 	my $self = shift;
+
 	my $type = ref($self)
 		or croak "$self is not an object";
 
@@ -325,6 +327,7 @@ sub set_seq {
 
 sub set_group {
 	my ($self) = shift;
+
 	my ($write_handle);
 
 	# Make sure we can read from the read handle
@@ -415,21 +418,18 @@ sub exp_stty {
 # If we want to clear the buffer. Otherwise Accum will grow during send_slow
 # etc. and contain the remainder after matches.
 sub clear_accum {
-	my ($self) = shift;
-	my ($temp) = ( ${*$self}{exp_Accum} );
-	${*$self}{exp_Accum} = '';
-
-	# return the contents of the accumulator.
-	return $temp;
+	my ($self) = @_;
+	return $self->set_accum('');
 }
 
 sub set_accum {
-	my ($self) = shift;
-	my ($temp) = ( ${*$self}{exp_Accum} );
-	${*$self}{exp_Accum} = shift;
+	my ($self, $accum) = @_;
+
+	my $old_accum = ${*$self}{exp_Accum};
+	${*$self}{exp_Accum} = $accum;
 
 	# return the contents of the accumulator.
-	return $temp;
+	return $old_accum;
 }
 
 ######################################################################
