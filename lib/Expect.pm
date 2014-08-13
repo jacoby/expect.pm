@@ -2145,9 +2145,9 @@ character.  telnet would return to you "\r\nEscape character is
              [ 'eof', sub { ... } ],
              [ 'timeout', sub { ... }, \$subparm1 ],
        '-i', [ $objn, ...],
-             '-ex', $exact_pattern, sub { ... },
-             $exact_pattern, sub { ...; exp_continue_timeout; },
-             '-re', $re_pattern, sub { ... },
+       '-ex', $exact_pattern, sub { ... },
+              $exact_pattern, sub { ...; exp_continue_timeout; },
+       '-re', $re_pattern, sub { ... },
        '-i', \@object_list, @pattern_list,
        ...);
 
