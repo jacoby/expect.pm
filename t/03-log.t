@@ -15,7 +15,7 @@ $e->spawn($^X . q{ -ne 'sleep 1; chomp; print scalar reverse; print "\n"' });
 
 my @reply;
 
-diag "Test created for https://rt.cpan.org/Ticket/Display.html?id=62359 relaed to clear_accum";
+diag "Test created for https://rt.cpan.org/Ticket/Display.html?id=62359 related to clear_accum";
 
 {
 	$e->send("abc\n");
