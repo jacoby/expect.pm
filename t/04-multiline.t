@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 33;
 use Expect;
 
 my $e = Expect->new;
@@ -17,12 +17,14 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	is $e->before, "My\nHello\n";
 	is $e->after, "\nWorld\nAnd\nMore\n";
 }
+my $wam = "\nWorld\nAnd\nMore\n";
 
 {
 	$e->send("def\n");
 	$e->expect(1, ['^fed$']);
 	is $e->match, 'fed', 'match';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
+
 }
 
 {
@@ -30,7 +32,7 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->expect(1, '-re', '(?:^X(.*d))');
 	is $e->match, 'XAnd', 'match';
 	is_deeply [$e->matchlist], ['And'], 'matchlist';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
 
 	#[   qr/(?m:^uc:\s*(\w+))/,
 }
@@ -39,14 +41,14 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X.*d$');
 	is $e->match, 'XAnd', 'match';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
 }
 
 {
 	$e->send("eroM\n");
 	$e->expect(1, '-re', '^M(..)e$');
 	is $e->match, 'More', 'match';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
 }
 
 
@@ -54,7 +56,7 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X(?s:.*)d$');
 	is $e->match, "XAnd\nWorld\nAnd", 'match';
-	$e->clear_accum;
+	is $e->clear_accum, "\nMore\n";
 }
 
 
@@ -62,7 +64,7 @@ $e->spawn($^X . q{ -ne 'chomp; print "My\nHello\n"; print scalar reverse; print 
 	$e->send("ghi\n");
 	$e->expect(1, '-re', '^ihg$');
 	is $e->match, 'ihg', 'match';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
 }
 
 my $last_match = $e->match;
@@ -77,7 +79,7 @@ my $last_match = $e->match;
 
 {
 	local $Expect::Multiline_Matching = 0;
-	$e->clear_accum;
+	is $e->clear_accum, "My\nHello\ncba$wam";
 	$e->send("def\n");
 	$e->expect(1, ['^fed$']);
 	#diag $e->before;
@@ -107,7 +109,7 @@ my $last_match = $e->match;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X.*d$');
 	is $e->match, $last_match, 'match';  # TODO: IMHO this should be undef as well.
-	$e->clear_accum;
+	is $e->clear_accum, "My\nHello\nfed${wam}My\nHello\nonm${wam}My\nHello\nXAnd${wam}";
 }
 
 {
@@ -115,7 +117,7 @@ my $last_match = $e->match;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X(?s:.*)d$');
 	is $e->match, $last_match, 'match'; # TODO ??
-	$e->clear_accum;
+	is $e->clear_accum, "My\nHello\nXAnd$wam";
 }
 
 
@@ -124,7 +126,7 @@ my $last_match = $e->match;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', 'X.*d');   # no ^ and $
 	is $e->match, 'XAnd', 'match';
-	$e->clear_accum;
+	is $e->clear_accum, $wam;
 }
 
 {
@@ -132,7 +134,7 @@ my $last_match = $e->match;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', 'X(?s:.*)d'); # no ^ and $
 	is $e->match, "XAnd\nWorld\nAnd", 'match';
-	$e->clear_accum;
+	is $e->clear_accum, "\nMore\n";
 }
 
 

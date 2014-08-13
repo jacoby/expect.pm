@@ -107,7 +107,7 @@ subtest timeout => sub {
 
 subtest notransfer => sub {
 	diag "Testing -notransfer...";
-	plan tests => 6;
+	plan tests => 8;
 
 	my $exp = Expect->new( $Perl . q{ -e 'print "X some other\n"; sleep 5;'} );
 	$exp->notransfer(1);
@@ -126,22 +126,26 @@ subtest notransfer => sub {
 
 	sleep(6);
 	my $val1 = '';
+	my $acc1 = '';
 	$exp->expect(
 		3,
-		[ 'some'  => sub { my $self = shift; $val1 = 'some'; $self->set_accum( $self->after() ); } ],
+		[ 'some'  => sub { my $self = shift; $val1 = 'some'; $acc1 = $self->set_accum( $self->after() ); } ],
 		[ eof     => sub { $val1 = 'eof'; } ],
 		[ timeout => sub { $val1 = 'timeout'; } ],
 	);
+	like $acc1, qr/^X some other[\r\n]*$/, 'accumulator';
 	is $val1, 'some';
 
 	my $val2 = '';
+	my $acc2 = '';
 	$exp->expect(
 		3,
 		[ 'some'  => sub { $val2 = 'some'; } ],
-		[ 'other' => sub { $val2 = 'other'; my $self = shift; $self->set_accum( $self->after() ); } ],
+		[ 'other' => sub { $val2 = 'other'; my $self = shift; my $acc2 = $self->set_accum( $self->after() ); } ],
 		[ eof     => sub { $val2 = 'eof'; } ],
 		[ timeout => sub { $val2 = 'timeout'; } ],
 	);
+	is $acc2, '', 'accumulator';
 	is $val2, 'other';
 
 	my $val3 = '';
