@@ -1309,6 +1309,7 @@ sub interconnect {
 						${*$read_handle}{"exp_Max_Accum"}
 					) if ( ${*$read_handle}{"exp_Max_Accum"} );
 					if ( $escape_character_buffer =~ /($escape_sequence)/ ) {
+						my $match = $1;
 						if ( ${*$read_handle}{"exp_Debug"} ) {
 							print STDERR
 								"\r\ninterconnect got escape sequence from ${*$read_handle}{exp_Pty_Handle}.\r\n";
@@ -1320,7 +1321,7 @@ sub interconnect {
 								undef,
 								_make_readable($escape_sequence)
 								) . "'\r\n";
-							print STDERR "\tMatched by string: '" . _trim_length( undef, _make_readable($&) ) . "'\r\n";
+							print STDERR "\tMatched by string: '" . _trim_length( undef, _make_readable($match) ) . "'\r\n";
 						}
 
 						# Print out stuff before the escape.
@@ -1328,8 +1329,8 @@ sub interconnect {
 						# over several reads.
 						# Let's get rid of it from this read. If part of it was
 						# in the last read there's not a lot we can do about it now.
-						if ( ${*$read_handle}{exp_Pty_Buffer} =~ /($escape_sequence)/ ) {
-							$read_handle->_print_handles($`);
+						if ( ${*$read_handle}{exp_Pty_Buffer} =~ /([\w\W]*)($escape_sequence)/ ) {
+							$read_handle->_print_handles($1);
 						} else {
 							$read_handle->_print_handles( ${*$read_handle}{exp_Pty_Buffer} );
 						}
@@ -1733,7 +1734,7 @@ sub _make_readable {
 	$s =~ s/\010/\\b/g;
 
 	# escape control chars high/low, but allow ISO 8859-1 chars
-	$s =~ s/[\000-\037\177-\237\377]/sprintf("\\%03lo",ord($&))/ge;
+	$s =~ s/([\000-\037\177-\237\377])/sprintf("\\%03lo",ord($1))/ge;
 
 	return $s;
 }
