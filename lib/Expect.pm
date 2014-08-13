@@ -458,6 +458,7 @@ sub exp_continue_timeout() {"exp_continue_timeout"}
 
 sub expect {
 	my $self;
+
 	print STDERR ("expect(@_) called...\n") if $Expect::Debug;
 	if ( defined( $_[0] ) ) {
 		if ( ref( $_[0] ) and $_[0]->isa('Expect') ) {
@@ -1693,7 +1694,7 @@ sub hard_close {
 # These should not be called externally.
 
 sub _init_vars {
-	my ($self) = shift;
+	my ($self) = @_;
 
 	# for every spawned process or filehandle.
 	${*$self}{exp_Log_Stdout} = $Expect::Log_Stdout
@@ -1716,10 +1717,13 @@ sub _init_vars {
 	# create empty expect_before & after lists
 	${*$self}{exp_expect_before_list} = [];
 	${*$self}{exp_expect_after_list}  = [];
+
+	return;
 }
 
 sub _make_readable {
-	my $s = shift;
+	my ($s) = @_;
+
 	$s = '' if not defined($s);
 	study $s;          # Speed things up?
 	$s =~ s/\\/\\\\/g; # So we can tell easily(?) what is a backslash
@@ -1740,15 +1744,13 @@ sub _make_readable {
 }
 
 sub _trim_length {
+	my ($self, $string, $length) = @_;
 
 	# This is sort of a reverse truncation function
 	# Mostly so we don't have to see the full output when we're using
 	# Also used if Max_Accum gets set to limit the size of the accumulator
 	# for matching functions.
 	# exp_internal
-	my ($self)   = shift;
-	my ($string) = shift;
-	my ($length) = shift;
 
 	# If we're not passed a length (_trim_length is being used for debugging
 	# purposes) AND debug >= 3, don't trim.
@@ -1756,9 +1758,9 @@ sub _trim_length {
 		if (defined($self)
 		and ${*$self}{"exp_Debug"} >= 3
 		and ( !( defined($length) ) ) );
-	my ($indicate_truncation) = '...' unless $length;
-	$length = 1021 unless $length;
-	return ($string) unless $length < length($string);
+	my $indicate_truncation = ($length ? '' : '...');
+	$length ||= 1021;
+	return $string if $length >= length $string;
 
 	# We wouldn't want the accumulator to begin with '...' if max_accum is passed
 	# This is because this funct. gets called internally w/ max_accum
@@ -1767,11 +1769,10 @@ sub _trim_length {
 }
 
 sub _print_handles {
+	my ($self, $print_this) = @_;
 
 	# Given crap from 'self' and the handles self wants to print to, print to
 	# them. these are indicated by the handle's 'group'
-	my ($self)       = shift;
-	my ($print_this) = shift;
 	if ( ${*$self}{exp_Log_Group} ) {
 		foreach my $handle ( @{ ${*$self}{exp_Listen_Group} } ) {
 			$print_this = '' unless defined($print_this);
@@ -1790,11 +1791,14 @@ sub _print_handles {
 		if ${*$self}{"exp_Log_Stdout"};
 	$self->print_log_file($print_this);
 	$| = 1; # This should not be necessary but autoflush() doesn't always work.
+
+	return;
 }
 
 sub _get_mode {
+	my ($handle)      = @_;
+
 	my ($fcntl_flags) = '';
-	my ($handle)      = shift;
 
 	# What mode are we opening with? use fcntl to find out.
 	$fcntl_flags = fcntl( \*{$handle}, Fcntl::F_GETFL, $fcntl_flags );
@@ -1821,13 +1825,16 @@ sub _undef {
 
 # clean up child processes
 sub DESTROY {
-	my $status = $?;   # save this as it gets mangled by the terminating spawned children
 	my $self   = shift;
+
+	my $status = $?;   # save this as it gets mangled by the terminating spawned children
 	if ( ${*$self}{exp_Do_Soft_Close} ) {
 		$self->soft_close();
 	}
 	$self->hard_close();
 	$? = $status;      # restore it. otherwise deleting an Expect object may mangle $?, which is unintuitive
+
+	return;
 }
 
 1;
