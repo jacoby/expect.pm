@@ -1,6 +1,8 @@
+1.27 2014-08-13
     Remove $& and $` fixing the rest of RT #61395
     Add more test cases.
-    Small code refactoring declaring loop variables.
+    Various code refactoring declaring loop variables;
+      parameter passing; return undef; etc.
 
 1.26 2014-08-12
     Skip the bc test on OS-es where it has been failing.
