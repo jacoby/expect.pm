@@ -12,13 +12,16 @@ if ( not -x $bc ) {
 	diag "which $which";
 	plan skip_all => "Need to have $bc installed to run this test";
 }
-my $bc_version = `$bc -v`;
-diag "--------- bc version on $^O";
-diag $bc_version;
-diag '---------';
-# just some notes:
-# on $^O = 'solaris' and on 'freebsd' bc does not have any banner (the warranty stuff)
-# on 'solaris' it also does not have a -v flag
+
+if ($^O !~ /^(openbsd|solaris)$/) {
+	my $bc_version = `$bc -v`;
+	diag "--------- bc version on $^O";
+	diag $bc_version;
+	diag '---------';
+	# just some notes:
+	# on $^O = 'solaris' and on 'freebsd' bc does not have any banner (the warranty stuff)
+	# and the also don't have a -v flag
+}
 
 subtest raw_pty_bc => sub {
 
@@ -65,7 +68,7 @@ subtest pty_bc => sub {
 	$e->expect( 1, [qr/warranty'\./ => sub { $warranty = 1 } ] );
 
 	SKIP: {
-		skip "No banner on $^O ", 1 if $^O =~ /^(freebsd|solaris)$/;
+		skip "No banner on $^O ", 1 if $^O =~ /^(openbsd|freebsd|solaris)$/;
 		ok $warranty, 'warranty found' or do {
 			diag $e->before;
 			return;
