@@ -10,3 +10,4 @@ META.json
 META.yml
 *.swp
 cover_db/
+Expect-*
