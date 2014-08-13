@@ -1186,17 +1186,16 @@ sub interact {
 }
 
 sub interconnect {
+	my (@handles) = @_;
 
 	#  my ($handle)=(shift); call as Expect::interconnect($spawn1,$spawn2,...)
-	my ( $rmask, $nfound, $nread );
-	my ( $rout, @bits, $emask, $eout, @ebits ) = ();
-	my ( $escape_sequence, $escape_character_buffer );
-	my (@handles) = @_;
-	my ( $handle, $read_handle, $write_handle );
+	my ( $nfound, $nread );
+	my ( $rout, @bits, $emask, $eout, @ebits );
+	my ( $escape_character_buffer );
 	my ( $read_mask, $temp_mask ) = ( '', '' );
 
 	# Get read/write handles
-	foreach $handle (@handles) {
+	foreach my $handle (@handles) {
 		$temp_mask = '';
 		vec( $temp_mask, $handle->fileno(), 1 ) = 1;
 
@@ -1208,11 +1207,11 @@ sub interconnect {
 	}
 	if ($Expect::Debug) {
 		print STDERR "Read handles:\r\n";
-		foreach $handle (@handles) {
+		foreach my $handle (@handles) {
 			print STDERR "\tRead handle: ";
 			print STDERR "'${*$handle}{exp_Pty_Handle}'\r\n";
 			print STDERR "\t\tListen Handles:";
-			foreach $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
+			foreach my $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
 				print STDERR " '${*$write_handle}{exp_Pty_Handle}'";
 			}
 			print STDERR ".\r\n";
@@ -1221,7 +1220,7 @@ sub interconnect {
 
 	#  I think if we don't set raw/-echo here we may have trouble. We don't
 	# want a bunch of echoing crap making all the handles jabber at each other.
-	foreach $handle (@handles) {
+	foreach my $handle (@handles) {
 		unless ( ${*$handle}{"exp_Manual_Stty"} ) {
 
 			# This is probably O/S specific.
@@ -1230,7 +1229,7 @@ sub interconnect {
 				if ${*$handle}{"exp_Debug"};
 			$handle->exp_stty("raw -echo");
 		}
-		foreach $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
+		foreach my $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
 			unless ( ${*$write_handle}{"exp_Manual_Stty"} ) {
 				${*$write_handle}{exp_Stored_Stty} =
 					$write_handle->exp_stty('-g');
@@ -1252,7 +1251,7 @@ sub interconnect {
 	while (1) {
 
 		# test each handle to see if it's still alive.
-		foreach $read_handle (@handles) {
+		foreach my $read_handle (@handles) {
 			waitpid( ${*$read_handle}{exp_Pid}, WNOHANG )
 				if ( exists( ${*$read_handle}{exp_Pid} )
 				and ${*$read_handle}{exp_Pid} );
@@ -1283,7 +1282,7 @@ sub interconnect {
 		@ebits = split( //, unpack( 'b*', $eout ) );
 
 		#    print "Ebits: $eout\r\n";
-		foreach $read_handle (@handles) {
+		foreach my $read_handle (@handles) {
 			if ( $bits[ $read_handle->fileno() ] ) {
 				$nread = sysread(
 					$read_handle, ${*$read_handle}{exp_Pty_Buffer},
@@ -1300,7 +1299,7 @@ sub interconnect {
 				$escape_character_buffer = ''
 					unless defined($escape_character_buffer);
 				$escape_character_buffer .= ${*$read_handle}{exp_Pty_Buffer};
-				foreach $escape_sequence ( keys( %{ ${*$read_handle}{exp_Function} } ) ) {
+				foreach my $escape_sequence ( keys( %{ ${*$read_handle}{exp_Function} } ) ) {
 					print STDERR "Tested escape sequence $escape_sequence from ${*$read_handle}{exp_Pty_Handle}"
 						if ${*$read_handle}{"exp_Debug"} > 1;
 
@@ -1378,11 +1377,11 @@ sub interconnect {
 			}
 		}
 	}
-	foreach $handle (@handles) {
+	foreach my $handle (@handles) {
 		unless ( ${*$handle}{"exp_Manual_Stty"} ) {
 			$handle->exp_stty( ${*$handle}{exp_Stored_Stty} );
 		}
-		foreach $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
+		foreach my $write_handle ( @{ ${*$handle}{exp_Listen_Group} } ) {
 			unless ( ${*$write_handle}{"exp_Manual_Stty"} ) {
 				$write_handle->exp_stty( ${*$write_handle}{exp_Stored_Stty} );
 			}
@@ -1427,15 +1426,14 @@ sub print (@) {
 # where from time to time they get unhappy if you send items too quickly.
 sub send_slow {
 	my ($self) = shift;
-	my ( $char, @linechars, $nfound, $rmask );
 	return if not defined $self->fileno(); # skip if closed
 	my ($sleep_time) = shift;
 
 	# Flushing makes it so each character can be seen separately.
 	my $chunk;
 	while ( $chunk = shift ) {
-		@linechars = split( '', $chunk );
-		foreach $char (@linechars) {
+		my @linechars = split( '', $chunk );
+		foreach my $char (@linechars) {
 
 			#     How slow?
 			select( undef, undef, undef, $sleep_time );
@@ -1446,7 +1444,7 @@ sub send_slow {
 
 			# I think I can get away with this if I save it in accum
 			if ( ${*$self}{"exp_Log_Stdout"} || ${*$self}{exp_Log_Group} ) {
-				$rmask = "";
+				my $rmask = "";
 				vec( $rmask, $self->fileno(), 1 ) = 1;
 
 				# .01 sec granularity should work. If we miss something it will
@@ -1474,27 +1472,26 @@ sub send_slow {
 }
 
 sub test_handles {
+	my ($timeout)     = shift;
+	my @handle_list = @_;
 
 	# This should be called by Expect::test_handles($timeout,@objects);
-	my ( $rmask, $allmask, $rout, $nfound, @bits );
-	my ($timeout)     = shift;
-	my (@handle_list) = @_;
-	my ($handle);
-	foreach $handle (@handle_list) {
-		$rmask = '';
+	my ( $allmask, $rout );
+	foreach my $handle (@handle_list) {
+		my $rmask = '';
 		vec( $rmask, $handle->fileno(), 1 ) = 1;
 		$allmask = '' unless defined($allmask);
 		$allmask = $allmask | $rmask;
 	}
-	($nfound) = select( $rout = $allmask, undef, undef, $timeout );
+	my ($nfound) = select( $rout = $allmask, undef, undef, $timeout );
 	return () unless $nfound;
 
 	# Which handles have stuff?
-	@bits = split( //, unpack( 'b*', $rout ) );
+	my @bits = split( //, unpack( 'b*', $rout ) );
 
 	my $handle_num  = 0;
 	my @return_list = ();
-	foreach $handle (@handle_list) {
+	foreach my $handle (@handle_list) {
 
 		# I go to great lengths to get perl -w to shut the hell up.
 		if ( defined( $bits[ $handle->fileno() ] )
@@ -1774,9 +1771,8 @@ sub _print_handles {
 	# them. these are indicated by the handle's 'group'
 	my ($self)       = shift;
 	my ($print_this) = shift;
-	my ($handle);
 	if ( ${*$self}{exp_Log_Group} ) {
-		foreach $handle ( @{ ${*$self}{exp_Listen_Group} } ) {
+		foreach my $handle ( @{ ${*$self}{exp_Listen_Group} } ) {
 			$print_this = '' unless defined($print_this);
 
 			# Appease perl -w
