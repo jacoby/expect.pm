@@ -118,7 +118,7 @@ sub spawn {
 
 	unless ( defined($pid) ) {
 		warn "Cannot fork: $!" if $^W;
-		return undef;
+		return;
 	}
 
 	if ($pid) {
@@ -139,7 +139,7 @@ sub spawn {
 		if ($errstatus) {
 			$! = $errno + 0;
 			warn "Cannot exec(@cmd): $!\n" if $^W;
-			return undef;
+			return;
 		}
 	} else {
 
@@ -337,7 +337,7 @@ sub set_group {
 		} else {
 
 			# Refrain from referencing an undef
-			return undef;
+			return;
 		}
 	}
 	@{ ${*$self}{exp_Listen_Group} } = ();
@@ -395,10 +395,10 @@ sub exp_stty {
 	my ($self) = shift;
 	my ($mode) = "@_";
 
-	return undef unless defined($mode);
+	return unless defined $mode;
 	if ( not defined $INC{"IO/Stty.pm"} ) {
 		carp "IO::Stty not installed, cannot change mode";
-		return undef;
+		return;
 	}
 
 	if ( ${*$self}{"exp_Debug"} ) {
@@ -434,8 +434,8 @@ sub set_accum {
 
 ######################################################################
 # define constants for pattern subs
-sub exp_continue()         {"exp_continue"}
-sub exp_continue_timeout() {"exp_continue_timeout"}
+sub exp_continue         {"exp_continue"}
+sub exp_continue_timeout {"exp_continue_timeout"}
 
 ######################################################################
 # Expect on multiple objects at once.
@@ -606,13 +606,13 @@ sub expect {
 		_multi_expect( 0, undef, @Expect::After_List );
 	}
 
-	wantarray ? @ret : $ret[0];
+	return wantarray ? @ret : $ret[0];
 }
 
 ######################################################################
 # the real workhorse
 #
-sub _multi_expect($$@) {
+sub _multi_expect {
 	my ($timeout, $timeout_hook, @params) = @_;
 
 	if ($timeout_hook) {
@@ -1059,7 +1059,7 @@ sub _multi_expect($$@) {
 #   if pattern matched;
 # the $parm_nr gets unshifted onto the array for reporting purposes.
 
-sub _add_patterns_to_list($$$@) {
+sub _add_patterns_to_list {
 	my ($listref, $timeoutlistref,$store_parm_nr, @params) = @_;
 
 	# $timeoutlistref gets timeout patterns
@@ -1407,7 +1407,7 @@ sub print_log_file {
 
 # we provide our own print so we can debug what gets sent to the
 # processes...
-sub print (@) {
+sub print {
 	my ( $self, @args ) = @_;
 
 	return if not defined $self->fileno(); # skip if closed
