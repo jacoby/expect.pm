@@ -2,16 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 use Expect;
 
 my $bc = '/usr/bin/bc';
 if ( not -x $bc ) {
 	diag "Could not find bc in $bc";
 	my $which = `which bc`;
-	diag "which $which";
+	diag "which bc: '$which'";
 	plan skip_all => "Need to have $bc installed to run this test";
 }
+
+plan tests => 2;
 
 if ($^O !~ /^(openbsd|solaris)$/) {
 	my $bc_version = `$bc -v`;
