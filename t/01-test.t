@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
+use Test::Exception;
 use File::Temp qw(tempdir);
 use Expect;
 
@@ -419,6 +420,14 @@ subtest eof_on_pty => sub {
 	}
 	is $res, $expected, "Sorry, you may not notice if the spawned process closes the pty. ($expected)";
 	$exp->hard_close();
+};
+
+subtest respawn => sub {
+	plan tests => 1;
+
+	my $exp = Expect->new;
+	$exp->spawn( $Perl . q{ -e 'print "42\n"'} );
+	throws_ok { $exp->spawn( $Perl . q{ -e 'print "23\n"'} ) } qr/^Cannot reuse an object with an already spawned command/;
 };
 
 
