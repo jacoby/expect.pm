@@ -2502,6 +2502,8 @@ appropriately set.
 
 =head2 Configurable Package Variables:
 
+=over 4
+
 =item $Expect::Debug
 
 Defaults to 0. Newly created objects have a $object->debug() value
@@ -2563,6 +2565,8 @@ qr//), then $Expect::Multiline_Matching has no effect.
 So if you pass in a regex, then you must use the qr's flags
 to control whether it is multiline (which by default it is not, opposite
 of the default behavior of Expect).
+
+=back
 
 =head1 CONTRIBUTIONS
 
