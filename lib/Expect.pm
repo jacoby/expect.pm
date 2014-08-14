@@ -2551,6 +2551,18 @@ you have this on you can match lines in the middle of a page of output
 using ^ and $ instead of it matching the beginning and end of the entire
 expression. I think this is handy.
 
+The $Expect::Multiline_Matching turns on and off Expect's multi-line
+matching mode. But this only has an effect if you pass in a string, and
+then use '-re' mode. If you pass in a regular expression value (via
+qr//), then the qr//'s own flags are preserved irrespective of what it
+gets interpolated into. There was a bug in Perl 5.8.x where interpolating
+a regex without /m into a match with /m would incorrectly apply the /m
+to the inner regex too, but this was fixed in Perl 5.10. The correct
+behavior, as seen in Perl 5.10, is that if you pass in a regex (via
+qr//), then $Expect::Multiline_Matching has no effect. 
+So if you pass in a regex, then you must use the qr's flags
+to control whether it is multiline (which by default it is not, opposite
+of the default behavior of Expect).
 
 =head1 CONTRIBUTIONS
 
