@@ -1,3 +1,7 @@
+1.28 2014-08-14
+    croak if undef passed to _trim_length
+    fix double planning on skipped test
+
 1.27 2014-08-13
     Remove $& and $` fixing the rest of RT #61395
     Add more test cases.

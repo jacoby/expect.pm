@@ -17,7 +17,7 @@ WriteMakefile(
 	},
 	BUILD_REQUIRES => {
 		'Test::More'      => '1.00',
-		'Test::Exception' => '0.32';
+		'Test::Exception' => '0.32',
 
 		# standard modules:
 		'File::Temp' => 0,
