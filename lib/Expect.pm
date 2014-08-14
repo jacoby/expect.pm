@@ -1759,6 +1759,8 @@ sub _trim_length {
 	# for matching functions.
 	# exp_internal
 
+	croak('No string passed') if not defined $string;
+
 	# If we're not passed a length (_trim_length is being used for debugging
 	# purposes) AND debug >= 3, don't trim.
 	return ($string)
