@@ -1,6 +1,10 @@
+1.29 2014-08-14
+    Official co-maintainer SZABGAB (Gabor Szabo)
+    Update documentation according to RT #60722
+
 1.28 2014-08-14
-    croak if undef passed to _trim_length
-    fix double planning on skipped test
+    Croak if undef passed to _trim_length
+    Fix double planning on skipped test
 
 1.27 2014-08-13
     Remove $& and $` fixing the rest of RT #61395
