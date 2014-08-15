@@ -61,7 +61,7 @@ subtest raw_pty_bc => sub {
 };
 
 subtest pty_bc => sub {
-	plan tests => 4;
+	plan tests => 6;
 
 	my $e = Expect->new;
 
@@ -80,7 +80,7 @@ subtest pty_bc => sub {
 	$e->send("23+7\n");
 	my $expr;
 	$e->expect( 1, [qr/23\+7/ => sub { $expr = 1 }] );
-	ok $expr, 'expression';
+	ok $expr, 'echo input';
 
 	my $num;
 	$e->expect( 1, [qr/\d+/ => sub { $num = 1 }] );
@@ -90,7 +90,10 @@ subtest pty_bc => sub {
 	};
 	my $match = $e->match;
 	is $match, 30, 'the number';
+	my $EMPTY = qr/^[\r\n]*$/;
+	like $e->before, $EMPTY, 'before';
+	like $e->after,  $EMPTY, 'after';
 	$e->send("quit\n");
-}
+};
 
 
