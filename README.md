@@ -12,10 +12,10 @@ Bundle::Expect available that installs everything for you.
 
 If you prefer manual installation, the usual
 
-  perl Makefile.PL
-  make
-  make test
-  make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 should work.
 
@@ -50,20 +50,6 @@ expectperl-discuss, at
 and
 
   http://lists.sourceforge.net/lists/listinfo/expectperl-discuss
-
-
-From the Changes file:
-======================
-
-+ added early return to send and send_slow if filehandle was closed
-
-+ added test for send_slow
-
-! fixed bug in expect() param handling (exact pattern "0" was ignored)
-
-! fixed bug in _make_readable()
-
-+ now included example ssh.pl in MANIFEST so it gets packaged :-(
 
 Thanks to everybody who wrote to me, either with bug reports,
 enhancement suggestions or especially fixes!
