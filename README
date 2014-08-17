@@ -1,6 +1,9 @@
+###Status
+[![Build Status](https://travis-ci.org/szabgab/expect.pm.png)](https://travis-ci.org/szabgab/expect.pm)
 
-Expect.pm v1.20
-===============
+
+Expect.pm
+=========
 
 Expect requires the latest version of IO::Tty, also available from
 CPAN.  IO::Stty has become optional but I'd suggest you also install
