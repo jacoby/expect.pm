@@ -163,8 +163,8 @@ subtest regex => sub {
 	ok $str =~ /$re/m, 're/m';
 
 	my $qre = qr/^ab$/;
-	ok $str !~ /$qre/,  'qre';
-	ok $str !~ /$qre/m, 'qre/m';  # I think this will fail on 5.8.x
+	unlike $str, qr/$qre/,  'qre';
+	unlike $str, qr/$qre/m, 'qre/m bug in perl 5.8.x'; # see http://www.perlmonks.org/?node_id=1097316
 };
 
 
