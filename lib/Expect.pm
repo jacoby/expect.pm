@@ -57,7 +57,7 @@ BEGIN {
 }
 
 sub version {
-	my ($version) = shift;
+	my ($version) = @_;
 
 	warn "Version $version is later than $Expect::VERSION. It may not be supported"
 		if ( defined($version) && ( $version > $Expect::VERSION ) );
@@ -68,7 +68,7 @@ sub version {
 }
 
 sub new {
-	my ($class) = shift;
+	my ($class, @args) = @_;
 
 	$class = ref($class) if ref($class); # so we can be called as $exp->new()
 
@@ -83,16 +83,17 @@ sub new {
 	${*$self}{exp_Log_Stdout} = 1;
 	$self->_init_vars();
 
-	if (@_) {
+	if (@args) {
 
 		# we got add'l parms, so pass them to spawn
-		return $self->spawn(@_);
+		return $self->spawn(@args);
 	}
 	return $self;
 }
 
 sub spawn {
-	my ($class) = shift;
+	my ($class, @cmd) = @_;
+	# spawn is passed command line args.
 
 	my $self;
 
@@ -104,7 +105,6 @@ sub spawn {
 
 	croak "Cannot reuse an object with an already spawned command"
 		if exists ${*$self}{"exp_Command"};
-	my (@cmd) = @_; # spawn is passed command line args.
 	${*$self}{"exp_Command"} = \@cmd;
 
 	# set up pipe to detect childs exec error
@@ -305,33 +305,30 @@ sub AUTOLOAD {
 ######################################################################
 
 sub set_seq {
+	my ( $self, $escape_sequence, $function, $params, @args ) = @_;
 
 	# Set an escape sequence/function combo for a read handle for interconnect.
 	# Ex: $read_handle->set_seq('',\&function,\@parameters);
-	my ($self) = shift;
-	my ( $escape_sequence, $function ) = ( shift, shift );
 	${ ${*$self}{exp_Function} }{$escape_sequence} = $function;
 	if ( ( !defined($function) ) || ( $function eq 'undef' ) ) {
 		${ ${*$self}{exp_Function} }{$escape_sequence} = \&_undef;
 	}
-	${ ${*$self}{exp_Parameters} }{$escape_sequence} = shift;
+	${ ${*$self}{exp_Parameters} }{$escape_sequence} = $params;
 
 	# This'll be a joy to execute. :)
 	if ( ${*$self}{"exp_Debug"} ) {
 		print STDERR "Escape seq. '" . $escape_sequence;
 		print STDERR "' function for ${*$self}{exp_Pty_Handle} set to '";
 		print STDERR ${ ${*$self}{exp_Function} }{$escape_sequence};
-		print STDERR "(" . join( ',', @_ ) . ")'\r\n";
+		print STDERR "(" . join( ',', @args ) . ")'\r\n";
 	}
 }
 
 sub set_group {
-	my ($self) = shift;
-
-	my ($write_handle);
+	my ($self, @args) = @_;
 
 	# Make sure we can read from the read handle
-	if ( !defined( $_[0] ) ) {
+	if ( !defined( $args[0] ) ) {
 		if ( defined( ${*$self}{exp_Listen_Group} ) ) {
 			return @{ ${*$self}{exp_Listen_Group} };
 		} else {
@@ -347,7 +344,7 @@ sub set_group {
 			"a non-readable handle!\r\n"
 		);
 	}
-	while ( $write_handle = shift ) {
+	while ( my $write_handle = shift @args ) {
 		if ( $write_handle->_get_mode() !~ 'w' ) {
 			warn(
 				"Attempting to set a non-writeable listen handle ",
@@ -360,13 +357,12 @@ sub set_group {
 }
 
 sub log_file {
-	my $self = shift;
+	my ($self, $file, $mode)  = @_;
+	$mode ||= "a";
 
 	return ( ${*$self}{exp_Log_File} )
-		if not @_; # we got no param, return filehandle
-
-	my $file = shift;
-	my $mode = shift || "a";
+		if @_ < 2; # we got no param, return filehandle
+	# $e->log_file(undef) is an acceptable call hence we need to check the number of parameters here
 
 	if ( ${*$self}{exp_Log_File} and ref( ${*$self}{exp_Log_File} ) ne 'CODE' ) {
 		close( ${*$self}{exp_Log_File} );
@@ -387,6 +383,8 @@ sub log_file {
 	}
 
 	${*$self}{exp_Log_File} = $fh;
+
+	return $fh;
 }
 
 # I'm going to leave this here in case I might need to change something.
