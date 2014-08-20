@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.70;
 
 WriteMakefile(
 	NAME         => 'Expect',
@@ -15,7 +15,10 @@ WriteMakefile(
 		'Exporter'   => 0,
 		'Errno'      => 0,
 	},
-	BUILD_REQUIRES => {
+	CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '6.70',
+    },
+	TEST_REQUIRES => {
 		'Test::More'      => '1.00',
 		'Test::Exception' => '0.32',
 
