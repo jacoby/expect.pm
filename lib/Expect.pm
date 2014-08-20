@@ -264,7 +264,7 @@ my %Readable_Vars = (
 );
 
 sub AUTOLOAD {
-	my $self = shift;
+	my ($self, @args) = @_;
 
 	my $type = ref($self)
 		or croak "$self is not an object";
@@ -280,15 +280,15 @@ sub AUTOLOAD {
 	my $tmp;
 	$tmp = ${*$self}{$varname} if exists ${*$self}{$varname};
 
-	if (@_) {
+	if (@args) {
 		if ( exists $Writeable_Vars{$name} ) {
 			my $ref = ref($tmp);
 			if ( $ref eq 'ARRAY' ) {
-				${*$self}{$varname} = [@_];
+				${*$self}{$varname} = [@args];
 			} elsif ( $ref eq 'HASH' ) {
-				${*$self}{$varname} = {@_};
+				${*$self}{$varname} = {@args};
 			} else {
-				${*$self}{$varname} = shift;
+				${*$self}{$varname} = shift @args;
 			}
 		} else {
 			carp "Trying to set read-only variable `$name'"
