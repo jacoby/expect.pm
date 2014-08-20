@@ -406,7 +406,7 @@ __EOT__
 subtest eof_on_pty => sub {
 	plan tests => 1;
 
-	my $exp = Expect->new( $Perl . q{ -e 'close STDIN; close STDOUT; close STDERR; sleep 3;'} );
+	my $exp = Expect->new( $Perl . q{ -e 'close STDIN; close STDOUT; close STDERR; sleep 4;'} );
 	my $res;
 	$exp->expect(
 		2,
@@ -414,6 +414,9 @@ subtest eof_on_pty => sub {
 		[ timeout => sub { $res = 'timeout' } ],
 	);
 
+	# on OSX it seems that when $Config{osvers} < 13 it returns eof  and when osvers is >= 13 then we get timeout
+	# http://www.cpantesters.org/distro/E/Expect.html?oncpan=1&distmat=1&version=1.29
+	# at least when we sleep 3 and wait for 2
 	my $expected = 'timeout';
 	if ($^O eq 'freebsd') {
 		$expected = 'eof';

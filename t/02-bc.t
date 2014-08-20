@@ -70,7 +70,7 @@ subtest pty_bc => sub {
 	$e->expect( 1, [qr/warranty'\./ => sub { $warranty = 1 } ] );
 
 	SKIP: {
-		skip "No banner on $^O ", 1 if $^O =~ /^(openbsd|freebsd|solaris)$/;
+		skip "No banner on $^O ", 1 if $^O =~ /^(openbsd|freebsd|netbsd|solaris)$/;
 		ok $warranty, 'warranty found' or do {
 			diag $e->before;
 			return;
