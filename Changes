@@ -1,5 +1,13 @@
+    RT #47834
+    After a failed call to ->expect the ->match, and ->after will return undef
+    and ->before will return the content of the accumulator.
+    Earlier they retained the values obtained during the last successful match.
+
+    ->before will return undef at the first time but later, if we call ->clear_accum,
+    it will start returning the empty string.
 
     CONFIGURE_REQUIRES ExtUtils::MakeMaker 6.70
+    Some test updates.
 
 1.29 2014-08-14
     Official co-maintainer SZABGAB (Gabor Szabo)

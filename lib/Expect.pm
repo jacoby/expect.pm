@@ -429,6 +429,10 @@ sub set_accum {
 	# return the contents of the accumulator.
 	return $old_accum;
 }
+sub get_accum {
+	my ($self) = @_;
+	return ${*$self}{exp_Accum};
+}
 
 ######################################################################
 # define constants for pattern subs
@@ -699,6 +703,9 @@ sub _multi_expect {
 
 				# clear error status
 				${*$exp}{exp_Error} = undef;
+				${*$exp}{exp_After}        = undef;
+				${*$exp}{exp_Match_Number} = undef;
+				${*$exp}{exp_Match}        = undef;
 
 				# This could be huge. We should attempt to do something
 				# about this.  Because the output is used for debugging

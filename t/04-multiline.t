@@ -67,8 +67,6 @@ my $wam = "\nWorld\nAnd\nMore\n";
 	is $e->clear_accum, $wam;
 }
 
-my $last_match = $e->match;
-
 {
 	local $Expect::Multiline_Matching = 0;
 	my $reply;
@@ -83,32 +81,23 @@ my $last_match = $e->match;
 	$e->send("def\n");
 	$e->expect(1, ['^fed$']);
 	#diag $e->before;
-	TODO: {
-		local $TODO = 'Why does the match return ihg in this example?';
-		# it seems ->match will return the string of the last successful match
-		# even if there were unsuccessful ->expect calls in the middle.
-		# This sounds like a bug.
-		is $e->match, undef, 'match';
-	}
-	is $e->match, $last_match, 'maybe it should return ihg';
+	is $e->match, undef, 'match';
+	is $e->match, undef;
 }
 
 {
 	local $Expect::Multiline_Matching = 0;
 	$e->send("mno\n");
 	$e->expect(1, '-re', '^onm$');
-	TODO: {
-		local $TODO = 'Why does the match return ihg in this example?';
-		is $e->match, undef, 'match';
-	}
-	is $e->match, $last_match, 'maybe it should return ihg';
+	is $e->match, undef, 'match';
+	is $e->match, undef;
 }
 
 {
 	local $Expect::Multiline_Matching = 0;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X.*d$');
-	is $e->match, $last_match, 'match';  # TODO: IMHO this should be undef as well.
+	is $e->match, undef;
 	is $e->clear_accum, "My\nHello\nfed${wam}My\nHello\nonm${wam}My\nHello\nXAnd${wam}";
 }
 
@@ -116,7 +105,7 @@ my $last_match = $e->match;
 	local $Expect::Multiline_Matching = 0;
 	$e->send("dnAX\n");
 	$e->expect(1, '-re', '^X(?s:.*)d$');
-	is $e->match, $last_match, 'match'; # TODO ??
+	is $e->match, undef;
 	is $e->clear_accum, "My\nHello\nXAnd$wam";
 }
 

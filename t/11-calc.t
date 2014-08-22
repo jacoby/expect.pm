@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12;
+plan tests => 16;
 
 use Expect;
 my $e = Expect->new;
@@ -16,6 +16,7 @@ $e->raw_pty(1);
 is $e->match, undef;
 is $e->before, undef;
 is $e->after, undef;
+is $e->get_accum, '';
 
 
 $e->send("19+23\n");
@@ -31,9 +32,16 @@ is $e->before, q{Input: '19+23' = };
 like $e->after,  qr/^ :Output\s*$/;
 
 $e->expect(1, 'abc');
-is $e->match, q{'42'};
+is $e->match, undef;
 like $e->before,  qr/^ :Output\s*$/;
-like $e->after,  qr/^ :Output\s*$/;
+is $e->after,  undef;
+
+$e->clear_accum;
+$e->expect(1, 'def');
+is $e->match, undef;
+is $e->before, '';    #??
+is $e->after,  undef;
+
 
 $e->close;
 
