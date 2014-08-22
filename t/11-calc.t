@@ -11,7 +11,7 @@ my $e = Expect->new;
 $e->spawn($^X, "examples/calc.pl") or die;
 
 $e->log_stdout(0);
-$e->raw_pty(1);
+#$e->raw_pty(1);
 
 is $e->match, undef;
 is $e->before, undef;
