@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9;
+plan tests => 12;
 
 use Expect;
 my $e = Expect->new;
@@ -12,6 +12,12 @@ $e->spawn($^X, "examples/calc.pl") or die;
 
 $e->log_stdout(0);
 $e->raw_pty(1);
+
+is $e->match, undef;
+is $e->before, undef;
+is $e->after, undef;
+
+
 $e->send("19+23\n");
 $e->expect(1, "19+23");
 is $e->match, '19+23';
