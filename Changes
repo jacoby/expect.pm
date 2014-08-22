@@ -1,3 +1,4 @@
+1.30 2014-08-22
     RT #47834
     After a failed call to ->expect the ->match, and ->after will return undef
     and ->before will return the content of the accumulator.
