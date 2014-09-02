@@ -418,7 +418,7 @@ subtest eof_on_pty => sub {
 	# http://www.cpantesters.org/distro/E/Expect.html?oncpan=1&distmat=1&version=1.29
 	# at least when we sleep 3 and wait for 2
 	my $expected = 'timeout';
-	if ($^O eq 'freebsd') {
+	if ($^O eq 'freebsd' or $^O eq 'midnightbsd') {
 		$expected = 'eof';
 	}
 	is $res, $expected, "Sorry, you may not notice if the spawned process closes the pty. ($expected)";
