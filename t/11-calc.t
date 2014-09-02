@@ -26,10 +26,13 @@ my $space;
 	is $exp, 1, 'expect';
 	is $e->match, '19+23', 'match';
 	is $e->before, '', 'before';
-	like $e->after, qr/^(\s*|\s*Input: '19\+23' = '42' :Output\s*)$/, 'after';
-	$space = $e->after =~ /^\s*$/;
+	my $SPACE = qr/\s*/;
+	my $OUTPUT = qr/\s*Input: '19\+23' = '42' :Output\s*/;
+	like $e->after, qr/^($SPACE|$OUTPUT)$/, 'after';
+	$space = $e->after =~ /^$SPACE$/;
 	diag $space ? 'SPACE' : 'OUTPUT';
-	like $e->clear_accum, qr/^\s*$/, 'clear_accum';
+	my $ACCUM = $space ? $SPACE : $OUTPUT;
+	like $e->clear_accum, qr/^$ACCUM$/, 'clear_accum';
 }
 
 if ($space) {
