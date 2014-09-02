@@ -2,6 +2,7 @@
        Now any ExtUtils::MakeMaker should work on the client side.
 
     In the tests, add special treatment for $^O=midnightbsd and dragonfly.
+       and for $^O=linux as well.
 
 1.30 2014-08-22
     RT #47834
