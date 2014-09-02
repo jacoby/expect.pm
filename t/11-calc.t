@@ -21,7 +21,7 @@ is $e->get_accum, '', 'get_accum';
 
 {
 	$e->send("19+23\n");
-	my $exp = $e->expect(1, "19+23");
+	my $exp = $e->expect(3, "19+23");
 	is $exp, 1, 'expect';
 	is $e->match, '19+23', 'match';
 	is $e->before, '', 'before';
