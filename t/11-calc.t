@@ -43,7 +43,7 @@ my $space;
 }
 
 SKIP: {
-	skip 'Strange behavior on some of the systems' if not $space;
+	skip 'Strange behavior on some of the systems', 4 if not $space;
 	my $exp = $e->expect(1, '-re' => qr/'\d+'/);
 	is $exp, 1, 'expect';
 	is $e->match, q{'42'}, 'match';
