@@ -1,7 +1,7 @@
     Eliminate the requirement for ExtUtils::MakeMaker 1.70.
        Now any ExtUtils::MakeMaker should work on the client side.
 
-    In the tests, add special treatment for $^O=midnightbsd.
+    In the tests, add special treatment for $^O=midnightbsd and dragonfly.
 
 1.30 2014-08-22
     RT #47834

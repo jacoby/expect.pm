@@ -15,7 +15,7 @@ if ( not -x $bc ) {
 
 plan tests => 2;
 
-if ($^O !~ /^(openbsd|solaris|midnightbsd)$/) {
+if ($^O !~ /^(openbsd|solaris|midnightbsd|dragonfly)$/) {
 	my $bc_version = `$bc -v`;
 	diag "--------- bc version on $^O";
 	diag $bc_version;
@@ -27,7 +27,7 @@ if ($^O !~ /^(openbsd|solaris|midnightbsd)$/) {
 
 subtest raw_pty_bc => sub {
 
-	if ($^O =~ /^(openbsd|netbsd|freebsd|solaris|darwin|midnightbsd)$/) {
+	if ($^O =~ /^(openbsd|netbsd|freebsd|solaris|darwin|midnightbsd|dragonfly)$/) {
 		plan skip_all => "This test fails on \$^O == \$Config{'osname'} == '$^O'";
 	}
 
@@ -70,7 +70,7 @@ subtest pty_bc => sub {
 	$e->expect( 1, [qr/warranty'\./ => sub { $warranty = 1 } ] );
 
 	SKIP: {
-		skip "No banner on $^O ", 1 if $^O =~ /^(openbsd|freebsd|netbsd|solaris|midnightbsd)$/;
+		skip "No banner on $^O ", 1 if $^O =~ /^(openbsd|freebsd|netbsd|solaris|midnightbsd|dragonfly)$/;
 		ok $warranty, 'warranty found' or do {
 			diag $e->before;
 			return;

@@ -5,6 +5,7 @@ use Test::More tests => 14;
 use Test::Exception;
 use File::Temp qw(tempdir);
 use Expect;
+use Config;
 
 #$Expect::Exp_Internal = 1;
 #$Expect::Debug = 1;
@@ -417,10 +418,16 @@ subtest eof_on_pty => sub {
 	# on OSX it seems that when $Config{osvers} < 13 it returns eof  and when osvers is >= 13 then we get timeout
 	# http://www.cpantesters.org/distro/E/Expect.html?oncpan=1&distmat=1&version=1.29
 	# at least when we sleep 3 and wait for 2
+	# When we sleep 4 the above is still true, except that one of 12.2.1 machines returned 'timeout':
+	# http://www.cpantesters.org/cpan/report/6dba0d70-2d3d-11e4-8483-fe44e5e3eb0b
 	my $expected = 'timeout';
-	if ($^O eq 'freebsd' or $^O eq 'midnightbsd') {
+	if ($Config{osname} =~ /^(freebsd|midnightbsd|dragonfly)$/) {
 		$expected = 'eof';
 	}
+	if ($Config{osname} eq 'darwin' and $Config{osvers} lt '13') {
+		$expected = 'eof';
+	}
+
 	is $res, $expected, "Sorry, you may not notice if the spawned process closes the pty. ($expected)";
 	$exp->hard_close();
 };

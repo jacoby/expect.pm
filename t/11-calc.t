@@ -21,9 +21,9 @@ is $e->get_accum, '';
 
 $e->send("19+23\n");
 $e->expect(1, "19+23");
-is $e->match, '19+23';
-is $e->before, '';
-like $e->after, qr/^\s*$/;
+is $e->match, '19+23', 'match';
+is $e->before, '', 'before';
+like $e->after, qr/^\s*$/, 'after';
 
 $e->clear_accum;
 $e->expect(1, '-re' => qr/'\d+'/);
@@ -45,3 +45,8 @@ is $e->after,  undef;
 
 $e->close;
 
+# These tests faled on midnightbsd, and on almost all cases of gnukfreebsd
+# http://www.cpantesters.org/cpan/report/fb542c9a-3253-11e4-a396-829772410e08
+# one was successful though.
+# On netbased failed on all except this one:
+# http://www.cpantesters.org/cpan/report/fd895392-2bbd-11e4-b698-db7a2867dcfa
