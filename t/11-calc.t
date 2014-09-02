@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20;
+plan tests => 22;
 
 use Expect;
 my $e = Expect->new;
@@ -19,17 +19,20 @@ is $e->after,  undef, 'after';
 is $e->get_accum, '', 'get_accum';
 
 
+my $space;
 {
 	$e->send("19+23\n");
-	my $exp = $e->expect(3, "19+23");
+	my $exp = $e->expect(1, "19+23");
 	is $exp, 1, 'expect';
 	is $e->match, '19+23', 'match';
 	is $e->before, '', 'before';
-	like $e->after, qr/^\s*$/, 'after';
+	like $e->after, qr/^(\s*|\s*Input: '19\+23' = '42' :Output\s*)$/, 'after';
+	$space = $e->after =~ /^\s*$/;
+	diag $space ? 'SPACE' : 'OUTPUT';
+	like $e->clear_accum, qr/^\s*$/, 'clear_accum';
 }
 
-{
-	$e->clear_accum;
+if ($space) {
 	my $exp = $e->expect(1, '-re' => qr/'\d+'/);
 	is $exp, 1, 'expect';
 	is $e->match, q{'42'}, 'match';
@@ -46,7 +49,7 @@ is $e->get_accum, '', 'get_accum';
 }
 
 {
-	$e->clear_accum;
+	like $e->clear_accum, qr/^ :Output\s*$/, 'clear_accum';
 	my $exp = $e->expect(1, 'xyz');
 	is $exp, undef, 'expect';
 	is $e->match, undef, 'match';
