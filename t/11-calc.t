@@ -33,7 +33,7 @@ my $space;
 	# and in other cases thet will have an 'after' containing the the string returned by the AUT.
 	# See for example the Travis reports of the Github repository.
 	# https://travis-ci.org/szabgab/expect.pm/builds
-	# between build 11 and 17
+	# between build 11 and 19
 	# The same strange behaviour is also encountered on the CPAN Testers.
 	like $e->after, qr/^($SPACE|$OUTPUT)$/, 'after';
 	$space = $e->after =~ /^$SPACE$/;
