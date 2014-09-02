@@ -28,6 +28,13 @@ my $space;
 	is $e->before, '', 'before';
 	my $SPACE = qr/\s*/;
 	my $OUTPUT = qr/\s*Input: '19\+23' = '42' :Output\s*/;
+
+	# This is very strange. It seems that the same system sometimes will have an almost empty 'after'
+	# and in other cases thet will have an 'after' containing the the string returned by the AUT.
+	# See for example the Travis reports of the Github repository.
+	# https://travis-ci.org/szabgab/expect.pm/builds
+	# between build 11 and 17
+	# The same strange behaviour is also encountered on the CPAN Testers.
 	like $e->after, qr/^($SPACE|$OUTPUT)$/, 'after';
 	$space = $e->after =~ /^$SPACE$/;
 	diag $space ? 'SPACE' : 'OUTPUT';
@@ -35,7 +42,8 @@ my $space;
 	like $e->clear_accum, qr/^$ACCUM$/, 'clear_accum';
 }
 
-if ($space) {
+SKIP: {
+	skip 'Strange behavior on some of the systems' if not $space;
 	my $exp = $e->expect(1, '-re' => qr/'\d+'/);
 	is $exp, 1, 'expect';
 	is $e->match, q{'42'}, 'match';
@@ -47,12 +55,13 @@ if ($space) {
 	my $exp = $e->expect(1, 'abc');
 	is $exp, undef, 'expect';
 	is $e->match, undef, 'match';
-	like $e->before,  qr/^ :Output\s*$/, 'before';
+	my $BEFORE = $space ? qr/^ :Output\s*$/ : qr/^$/;
+	like $e->before, $BEFORE, 'before';
 	is $e->after,  undef, 'after';
+	like $e->clear_accum, $BEFORE, 'clear_accum';
 }
 
 {
-	like $e->clear_accum, qr/^ :Output\s*$/, 'clear_accum';
 	my $exp = $e->expect(1, 'xyz');
 	is $exp, undef, 'expect';
 	is $e->match, undef, 'match';
