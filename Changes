@@ -1,3 +1,6 @@
+1.32 2014-10-26
+    Skip bc tests. https://rt.cpan.org/Ticket/Display.html?id=98495
+
 1.31 2014-09-02
     Eliminate the requirement for ExtUtils::MakeMaker 1.70.
        Now any ExtUtils::MakeMaker should work on the client side.

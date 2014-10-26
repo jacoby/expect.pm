@@ -4,6 +4,7 @@ use warnings;
 
 use Test::More;
 use Expect;
+plan skip_all => 'See https://rt.cpan.org/Ticket/Display.html?id=98495';
 
 my $bc = '/usr/bin/bc';
 if ( not -x $bc ) {
