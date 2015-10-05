@@ -1953,6 +1953,8 @@ There are several configurable package variables that affect the behavior of Exp
 
 =head1 DESCRIPTION
 
+See an explanation of L<What is Expect|http://code-maven.com/expect>
+
 The Expect module is a successor of Comm.pl and a descendent of Chat.pl. It
 more closely resembles the Tcl Expect language than its predecessors. It
 does not contain any of the networking code found in Comm.pl. I suspect this
@@ -3088,7 +3090,7 @@ And then $process->expect($timeout,'____END____','other','patterns');
 
 =head1 HOMEPAGE
 
-http://sourceforge.net/projects/expectperl/
+L<http://sourceforge.net/projects/expectperl/> though the source code is now in GitHub: L<https://github.com/szabgab/expect.pm>
 
 
 =head1 MAILING LISTS
