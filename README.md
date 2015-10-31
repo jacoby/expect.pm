@@ -54,7 +54,8 @@ and
 Thanks to everybody who wrote to me, either with bug reports,
 enhancement suggestions or especially fixes!
 
-Roland Giersig (maintainer of Expect.pm, IO::Tty, IO::Stty, Tie::Persistent)
-RGiersig@cpan.org
+Dave Jacoby (maintaner of Expect.pm)
+jacoby@cpan.org
 
-2005-07-20
+2015-10-31
+
