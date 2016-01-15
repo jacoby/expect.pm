@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 14;
-use Test::Exception;
 use File::Temp qw(tempdir);
 use Expect;
 use Config;
@@ -441,7 +440,8 @@ subtest respawn => sub {
 
 	my $exp = Expect->new;
 	$exp->spawn( $Perl . q{ -e 'print "42\n"'} );
-	throws_ok { $exp->spawn( $Perl . q{ -e 'print "23\n"'} ) } qr/^Cannot reuse an object with an already spawned command/;
+	eval { $exp->spawn( $Perl . q{ -e 'print "23\n"'} ) };
+    like $@, qr/^Cannot reuse an object with an already spawned command/;
 };
 
 
