@@ -41,4 +41,5 @@
 .gitignore
 .*\.swp
 MYMETA.*
-
+.perltidyrc
+.travis.yml
