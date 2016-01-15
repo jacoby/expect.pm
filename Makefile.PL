@@ -18,7 +18,7 @@ my %conf = (
 		'Errno'      => 0,
 	},
 	ABSTRACT_FROM => 'lib/Expect.pm',
-	clean        => { 'FILES' => '*.log' },
+	clean        => { 'FILES' => '*.log Expect-*' },
 	dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
 );
 
