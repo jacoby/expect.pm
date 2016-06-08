@@ -18,7 +18,8 @@ my %conf = (
 		'Errno'      => 0,
 	},
 	ABSTRACT_FROM => 'lib/Expect.pm',
-	clean        => { 'FILES' => '*.log' },
+	MIN_PERL_VERSION => '5.006000',
+	clean        => { 'FILES' => '*.log Expect-*' },
 	dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
 );
 
