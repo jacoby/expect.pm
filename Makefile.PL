@@ -45,7 +45,6 @@ my %configure_requires = (
 my %build_requires = ();
 my %test_requires = (
 		'Test::More'      => '1.00',
-		'Test::Exception' => '0.32',
 
 		# standard modules:
 		'File::Temp' => 0,
