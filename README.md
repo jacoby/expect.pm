@@ -1,5 +1,5 @@
 ###Status
-[![Build Status](https://travis-ci.org/szabgab/expect.pm.png)](https://travis-ci.org/szabgab/expect.pm)
+[![Build Status](https://travis-ci.org/jacoby/expect.pm.png)](https://travis-ci.org/jacoby/expect.pm)
 
 
 Expect.pm
