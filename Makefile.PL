@@ -17,6 +17,11 @@ my %conf = (
 		'Exporter'   => 0,
 		'Errno'      => 0,
 	},
+    AUTHOR        => [
+        'Austin Schutz <ASchutz@users.sourceforge.net>',
+        'Roland Giersig <RGiersig@cpan.org>',
+        'Dave Jacoby <jacoby@cpan.org>',
+    ],
 	ABSTRACT_FROM => 'lib/Expect.pm',
 	MIN_PERL_VERSION => '5.006000',
 	clean        => { 'FILES' => '*.log Expect-*' },
