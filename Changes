@@ -1,6 +1,7 @@
 Revision history for CPAN module Expect
 
-1.34 2017-05-??
+1.34 2017-05-18
+    Official maintainer JACOBY (Dave Jacoby)
     - Added a MANIFEST so that "make dist" will work
 
 1.33 2016-06-08

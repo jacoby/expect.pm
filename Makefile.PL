@@ -33,8 +33,8 @@ if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
 		resources => {
 			repository => {
 				type => 'git',
-				url  => 'http://github.com/szabgab/expect.pm.git',
-				web  => 'http://github.com/szabgab/expect.pm',
+				url  => 'http://github.com/jacoby/expect.pm.git',
+				web  => 'http://github.com/jacoby/expect.pm',
 			}
 		}
 	};
