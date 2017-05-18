@@ -2,6 +2,7 @@ Revision history for CPAN module Expect
 
 1.34 2017-05-??
     - Added a MANIFEST so that "make dist" will work
+    - Added AUTHOR key, listing all maintainers
 
 1.33 2016-06-08
     Remove dependency on Test::Exception
