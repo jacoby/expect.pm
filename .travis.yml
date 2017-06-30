@@ -2,6 +2,9 @@ branches:
   except:
     - gh-pages
 language: perl
+os:
+  - linux
+  - osx
 perl:
   - "5.26"
   - "5.24"
