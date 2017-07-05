@@ -32,7 +32,7 @@ my @modules = qw(
 pass('All external modules loaded') ;
 
 
-diag( "Testing ack version $Expect::VERSION under Perl $], $^X" );
+diag( "Testing Expect version $Expect::VERSION under Perl $], $^X" );
 for my $module ( @modules ) {
     no strict 'refs';
     my $ver = ${$module . '::VERSION'};
