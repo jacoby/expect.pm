@@ -479,11 +479,11 @@ sub expect {
 	croak "expect(): not enough arguments, should be expect(timeout, [patterns...])"
 		if @_ < 1;
 	my $timeout;
-	if ( ! looks_like_number($_[0]) && $self->timeout ) {
-		$timeout = $self->timeout; 
+	if ( looks_like_number($_[0]) or not defined $_[0] ) {
+		$timeout = shift;
 		}
 	else {
-		$timeout = shift;
+		$timeout = $self->timeout; 
 		}
 	my $timeout_hook = undef;
 
