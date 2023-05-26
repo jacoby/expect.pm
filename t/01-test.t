@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use File::Temp qw(tempdir);
 use Expect;
 use Config;
@@ -442,6 +442,14 @@ subtest respawn => sub {
 	$exp->spawn( $Perl . q{ -e 'print "42\n"'} );
 	eval { $exp->spawn( $Perl . q{ -e 'print "23\n"'} ) };
     like $@, qr/^Cannot reuse an object with an already spawned command/;
+};
+
+subtest "regexp ref" => sub {
+	plan tests => 1;
+
+	my $exp = Expect->spawn("$Perl -v");
+	$exp->log_user(0);
+	is( $exp->expect( 10, qr/L.*[WH]all/ ), 1 );
 };
 
 
