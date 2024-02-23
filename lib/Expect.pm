@@ -29,6 +29,7 @@ use Carp qw(cluck croak carp confess);
 use IO::Handle ();
 use Exporter   qw(import);
 use Errno;
+use Scalar::Util qw/ looks_like_number /;
 
 # This is necessary to make routines within Expect work.
 
@@ -89,6 +90,12 @@ sub new {
 		return $self->spawn(@args);
 	}
 	return $self;
+}
+
+sub timeout {
+    my $self = shift;
+    ${*$self}{expect_timeout} = shift if @_;
+    return ${*$self}{expect_timeout};
 }
 
 sub spawn {
@@ -471,7 +478,7 @@ sub expect {
 	}
 	croak "expect(): not enough arguments, should be expect(timeout, [patterns...])"
 		if @_ < 1;
-	my $timeout      = shift;
+    my $timeout = looks_like_number($_[0]) ? shift : $self->timeout;
 	my $timeout_hook = undef;
 
 	my @object_list;
@@ -2109,7 +2116,14 @@ want a regexp match, use a regexp object (C<qr//>) or prefix the pattern with '-
 Due to o/s limitations $timeout should be a round number. If $timeout
 is 0 Expect will check one time to see if $object's handle contains
 any of the match_patterns. If $timeout is undef Expect
-will wait forever for a pattern to match.
+will wait forever for a pattern to match. If you don't want to 
+explicitly put the timeout on all calls to C<expect>, you can set 
+it via the C<timeout> method . If the first argument of C<expect> 
+doesn't look like a number, that value will be used.
+
+  $object->timeout(15);
+  $object->expect('match me exactly','-re','match\s+me\s+exactly');
+
 
 If called in a scalar context, expect() will return the position of
 the matched pattern within @matched_patterns, or undef if no pattern was

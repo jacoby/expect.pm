@@ -12,6 +12,7 @@ use Config;
 my $tempdir = tempdir( CLEANUP => 1 );
 my $Perl = $^X;
 
+
 subtest perl => sub {
 	diag "Basic tests...";
 	plan tests => 4;
@@ -450,6 +451,20 @@ subtest "regexp ref" => sub {
 	my $exp = Expect->spawn("$Perl -v");
 	$exp->log_user(0);
 	is( $exp->expect( 10, qr/L.*[WH]all/ ), 1 );
+  };
+
+subtest "implicit timeout" => sub {
+	diag "Basic tests...";
+	plan tests => 4;
+
+	my $exp = Expect->spawn("$Perl -v");
+    $exp->timeout(10);
+
+	ok( defined $exp );
+	$exp->log_user(0);
+	is( $exp->expect( "krzlbrtz",   "Copyright" ), 2 );
+	is( $exp->expect( "Larry Wall", "krzlbrtz" ),  1 );
+	ok( not $exp->expect( "Copyright" ) );
 };
 
 
