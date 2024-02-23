@@ -507,7 +507,10 @@ sub expect {
 		print STDERR ("expect(): handling param '$parm'...\n")
 			if $Expect::Debug;
 		if ( ref($parm) ) {
-			if ( ref($parm) eq 'ARRAY' ) {
+			if ( ref($parm) eq 'Regexp' ) {
+                push @pattern_list, [ $parm_nr, '-re', $parm, undef ];
+            }
+			elsif ( ref($parm) eq 'ARRAY' ) {
 				my $err = _add_patterns_to_list(
 					\@pattern_list, \@timeout_list,
 					$parm_nr,       $parm
@@ -2105,8 +2108,9 @@ makes the pty transparently act like a bidirectional pipe.
 
 Given $timeout in seconds Expect will wait for $object's handle to produce
 one of the match_patterns, which are matched exactly by default. If you
-want a regexp match, prefix the pattern with '-re'.
+want a regexp match, use a regexp object (C<qr//>) or prefix the pattern with '-re'.
 
+  $object->expect(15, 'match me exactly', qr/match\s+me\s+exactly/);
   $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
 
 Due to o/s limitations $timeout should be a round number. If $timeout

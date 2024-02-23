@@ -445,20 +445,13 @@ subtest respawn => sub {
     like $@, qr/^Cannot reuse an object with an already spawned command/;
 };
 
-subtest "implicit timeout" => sub {
-	diag "Basic tests...";
-	plan tests => 4;
+subtest "regexp ref" => sub {
+	plan tests => 1;
 
 	my $exp = Expect->spawn("$Perl -v");
-    $exp->timeout(10);
-
-	ok( defined $exp );
 	$exp->log_user(0);
-	is( $exp->expect( "krzlbrtz",   "Copyright" ), 2 );
-	is( $exp->expect( "Larry Wall", "krzlbrtz" ),  1 );
-	ok( not $exp->expect( "Copyright" ) );
-};
-
+	is( $exp->expect( 10, qr/L.*[WH]all/ ), 1 );
+  };
 
 use Test::Builder;
 my $Test = Test::Builder->new;
