@@ -39,7 +39,8 @@ jobs:
         run: |
           echo 'cpanm'
           cpanm --notest Test::Builder Test::More IO::Pty IO::Tty
-          cpanm --installdeps --notest .          perl Makefile.pl
+          cpanm --installdeps --notest . 
+          ls
           echo 'make'
           perl Makefile.PL
           make 
