@@ -37,7 +37,7 @@ use Scalar::Util qw/ looks_like_number /;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.35';
+	$Expect::VERSION = '1.36';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
