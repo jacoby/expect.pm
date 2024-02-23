@@ -5,8 +5,9 @@ install:
   - if not exist "C:\strawberry" choco install strawberryperl -y
   - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
   - cd %APPVEYOR_BUILD_FOLDER%
-  - cpanm --quiet --installdeps --with-develop --notest .
+  - cpan --quiet --installdeps --with-develop --notest .
 
+build: off
 build_script:
   - perl Makefile.PL
   - gmake
