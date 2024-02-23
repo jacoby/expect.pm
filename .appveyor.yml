@@ -1,17 +1,18 @@
-cache:
-  - C:\strawberry
+# moved to GitHub Actions
+# cache:
+#   - C:\strawberry
 
-install:
-  - if not exist "C:\strawberry" choco install strawberryperl -y
-  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - cpanm IO::Pty IO::Tty
-  - cpanm --quiet --installdeps --with-develop --notest .
+# install:
+#   - if not exist "C:\strawberry" choco install strawberryperl -y
+#   - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+#   - cd %APPVEYOR_BUILD_FOLDER%
+#   - cpanm IO::Pty IO::Tty
+#   - cpanm --quiet --installdeps --with-develop --notest .
 
-build: off
-build_script:
-  - perl Makefile.PL
-  - gmake
+# build: off
+# build_script:
+#   - perl Makefile.PL
+#   - gmake
 
-test_script:
-  - gmake test
+# test_script:
+#   - gmake test
