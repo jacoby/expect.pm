@@ -1,4 +1,4 @@
-name: run perl test
+name: run perl ubuntu
 
 on:
   push:
