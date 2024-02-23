@@ -37,7 +37,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Regular tests
         run: 
+          echo 'cpanm'
           cpanm --notest Test::Builder Test::More IO::Pty IO::Tty
           cpanm --installdeps --notest .          perl Makefile.pl
+          echo 'make'
+          perl Makefile.PL
           make 
           make test
+          echo 'done'
