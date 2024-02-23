@@ -35,7 +35,7 @@ jobs:
     container:
       image: perldocker/perl-tester:${{ matrix.perl-version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Regular tests
         run: |
           cpanm --notest Test::Builder Test::More IO::Pty IO::Tty
