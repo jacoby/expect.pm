@@ -478,7 +478,13 @@ sub expect {
 	}
 	croak "expect(): not enough arguments, should be expect(timeout, [patterns...])"
 		if @_ < 1;
-    my $timeout = looks_like_number($_[0]) ? shift : $self->timeout;
+	my $timeout;
+	if ( ! looks_like_number($_[0]) && $self->timeout ) {
+		$timeout = $self->timeout; 
+		}
+	else {
+		$timeout = shift;
+		}
 	my $timeout_hook = undef;
 
 	my @object_list;
@@ -511,6 +517,7 @@ sub expect {
                 push @pattern_list, [ $parm_nr, '-re', $parm, undef ];
             }
 			elsif ( ref($parm) eq 'ARRAY' ) {
+			# if ( ref($parm) eq 'ARRAY' ) {
 				my $err = _add_patterns_to_list(
 					\@pattern_list, \@timeout_list,
 					$parm_nr,       $parm
