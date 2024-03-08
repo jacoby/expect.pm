@@ -42,7 +42,6 @@ my $space;
 	like $e->clear_accum, qr/^$ACCUM$/, 'clear_accum';
 }
 
-diag qq{STATE OF SPACE: $space};
 SKIP: {
 	skip 'Strange behavior on some of the systems', 4 if not $space;
 	my $exp = $e->expect(1, '-re' => qr/'\d+'/);
