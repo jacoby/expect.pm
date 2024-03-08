@@ -1,5 +1,8 @@
 Revision history for CPAN module Expect
 
+1.37 2024-03-07
+    - Fix to timeout code
+
 1.36 2024-02-23
     - Made timeouts optional and added qr// regex support
 
