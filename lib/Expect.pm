@@ -2324,7 +2324,7 @@ from fileno 7) or `STDIN'. Useful for debugging.
 =item $object->restart_timeout_upon_receive(0 | 1)
 
 If this is set to 1, the expect timeout is retriggered whenever something
-is received from the spawned command.  This allows to perform some
+is received from the spawned command.  This allows one to perform some
 aliveness testing and still expect for patterns.
 
     $exp->restart_timeout_upon_receive(1);
