@@ -1,4 +1,4 @@
-name: run perl ubuntu
+name: run tests on Linux and MacOS
 
 on:
   push:
@@ -17,6 +17,7 @@ jobs:
         with:
             submodules: recursive
       - run: perl -V
+      - run: eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
       - run: curl -kL http://cpanmin.us | perl - App::cpanminus
       - run: cpanm --notest --installdeps --verbose .
       - run: perl Makefile.PL
