@@ -17,6 +17,7 @@ jobs:
         with:
             submodules: recursive
       - run: perl -V
+      - run: curl -kL http://cpanmin.us | perl - App::cpanminus
       - run: cpanm --notest --installdeps --verbose .
       - run: perl Makefile.PL
       - run: make
