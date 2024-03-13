@@ -8,6 +8,19 @@ on:
     branches:
       - "*"
 jobs:
+  mac-test:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: perl -V
+      - run: cpanm --notest --installdeps --verbose .
+      - run: perl Makefile.PL
+      - run: make
+      - run: prove -wlvmb t
   perl-job:
     runs-on: ubuntu-latest
     strategy:
