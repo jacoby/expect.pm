@@ -18,6 +18,7 @@ jobs:
             submodules: recursive
       - run: perl -V
       - run: sudo cpan App::cpanminus
+      - run: sleep 5
       - run: cpanm --notest --installdeps --verbose .
       - run: perl Makefile.PL
       - run: make
